@@ -1,6 +1,6 @@
 import '@rentbook/rentbook-ui-lib/microfrontend.min.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { sellerPickupData ,returnPickupData } from './mock/pickup'
+import { sellerPickupData } from './mock/pickup'
 import PickupSuccess from './Pages/PickupSuccess'
 import PickupVerification from './Pages/PickupVerification'
 
