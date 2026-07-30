@@ -23,7 +23,6 @@ const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
     onChange?.({ requiredPhotos: next, damagePhotos: damage });
   };
 
-  // ---- Required photo handlers ----
 
   const handleRequiredPhotoSelected = (slot: RequiredPhotoType, file: File) => {
     const next = { ...requiredPhotos, [slot]: file };
@@ -36,8 +35,6 @@ const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
     setRequiredPhotos(next);
     emitChange(next, damagePhotos);
   };
-
-  // ---- Damage photo handlers ----
 
   const handleDamagePhotosAdded = (files: FileList) => {
     const next = [...damagePhotos, ...Array.from(files)];
