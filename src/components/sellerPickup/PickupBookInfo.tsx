@@ -1,5 +1,5 @@
 import { Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
-import type { PickupDetails } from "../../types/pickup";
+import type { PickupDetails } from "../../Types/pickup";
 
 interface PickupBookInfoProps {
   pickup: PickupDetails;

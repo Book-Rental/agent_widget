@@ -1,4 +1,4 @@
-import { PickupDetails } from "../types/pickup";
+import { PickupDetails } from "../Types/pickup";
 
 export const sellerPickupData: PickupDetails = {
   orderId: "ORD-100234",

@@ -1,5 +1,5 @@
 import { Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
-import type { ReferencePhotos } from "../../types/pickup";
+import type { ReferencePhotos } from "../../Types/pickup";
 
 interface ReferencePhotosSectionProps {
   referencePhotos: ReferencePhotos;

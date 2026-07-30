@@ -2,8 +2,9 @@ import { Rb_Button } from "@rentbook/rentbook-ui-lib";
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
 import PickupBookInfo from "../components/sellerPickup/PickupBookInfo";
-import { PickupDetails } from "../types/pickup";
+
 import ReferencePhotosSection from "../components/sellerPickup/ReferencePhotosSection";
+import { PickupDetails } from "../Types/pickup";
 
 interface PickupVerificationProps {
   pickup: PickupDetails;

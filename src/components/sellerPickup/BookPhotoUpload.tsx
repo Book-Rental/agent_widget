@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Rb_Text } from "@rentbook/rentbook-ui-lib";
-import { type RequiredPhotoType, type RequiredPhotos } from "../../types/pickup";
+import { type RequiredPhotoType, type RequiredPhotos } from "../../Types/pickup";
 import RequiredPhotosSection from "./RequiredPhotosSection";
 import DamagePhotoSection from "./DamagePhotoSection";
 

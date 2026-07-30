@@ -1,6 +1,6 @@
 import { FiCamera, FiCheck, FiTrash2 } from "react-icons/fi";
 import { Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
-import { RequiredPhotoType } from "../../types/pickup";
+import { RequiredPhotoType } from "../../Types/pickup";
 
 
 interface RequiredPhotoSlotProps {

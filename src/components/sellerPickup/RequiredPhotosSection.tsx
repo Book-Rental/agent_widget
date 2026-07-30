@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Rb_Text } from "@rentbook/rentbook-ui-lib";
 
 import RequiredPhotoSlot from "./RequiredPhotoSlot";
-import { RequiredPhotos, RequiredPhotoType, REQUIRED_SLOTS } from "../../types/pickup";
+import { RequiredPhotos, RequiredPhotoType, REQUIRED_SLOTS } from "../../Types/pickup";
 
 
 interface RequiredPhotosSectionProps {
