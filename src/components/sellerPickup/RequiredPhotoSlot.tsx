@@ -1,7 +1,7 @@
 import { FiCamera, FiCheck, FiTrash2 } from "react-icons/fi";
 import { Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { RequiredPhotoType } from "../../Types/pickup";
-
+import { FrontCoverIcon, BackCoverIcon, SpineIcon } from "./BookOrientationIcons";
 
 interface RequiredPhotoSlotProps {
   slotKey: RequiredPhotoType;
@@ -20,13 +20,16 @@ const RequiredPhotoSlot = ({
   onPick,
   onRemove,
 }: RequiredPhotoSlotProps) => {
-  if (!file) {
+   const OrientationIcon =
+    slotKey === "front" ? FrontCoverIcon : slotKey === "back" ? BackCoverIcon : SpineIcon;
+   if (!file) {
     return (
       <div
         onClick={() => onPick(slotKey)}
         className="cursor-pointer rounded-xl border-2 border-dashed border-violet-300 bg-violet-50 p-6 text-center transition hover:bg-violet-100"
       >
-        <FiCamera size={32} className="mx-auto text-blue-600" />
+        <OrientationIcon className="mx-auto h-10 w-10 text-blue-600" />
+        <FiCamera size={20} className="mx-auto mt-2 text-blue-400" />
         <Rb_Text className="mt-3 text-sm font-semibold text-blue-600">
           {label}
         </Rb_Text>

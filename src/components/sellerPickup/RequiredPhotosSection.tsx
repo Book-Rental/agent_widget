@@ -1,9 +1,7 @@
 import { useRef } from "react";
 import { Rb_Text } from "@rentbook/rentbook-ui-lib";
-
 import RequiredPhotoSlot from "./RequiredPhotoSlot";
 import { RequiredPhotos, RequiredPhotoType, REQUIRED_SLOTS } from "../../Types/pickup";
-
 
 interface RequiredPhotosSectionProps {
   requiredPhotos: RequiredPhotos;
@@ -46,7 +44,7 @@ const RequiredPhotosSection = ({
 
       <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {REQUIRED_SLOTS.map((slot) => (
-          <RequiredPhotoSlot
+           <RequiredPhotoSlot
             key={slot.key}
             slotKey={slot.key}
             label={slot.label}
