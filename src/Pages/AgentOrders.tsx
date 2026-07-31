@@ -1,185 +1,20 @@
 import { useMemo, useState } from "react";
 import {
+  Dropdown,
   Rb_Button,
   Rb_Text,
-  Dropdown,
 } from "@rentbook/rentbook-ui-lib";
 
-type OrderStatus =
-  | "Assigned"
-  | "Out for Pickup"
-  | "Picked Up"
-  | "Going to Hub"
-  | "Handed Over to Hub"
-  | "Completed"
-  | "Cancelled";
+import type {
+  AgentOrder,
+  OrderStatus,
+} from "../Types/AgentTypes";
 
-type Address = {
-  name: string;
-  type: string;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  phone: string;
-  location: {
-    type: "Point";
-    coordinates: [number, number];
-  };
-};
+import { orderResponse } from "../mock/OrderDetails";
 
-type HubDetails = {
-  hubId: string;
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  distance?: string;
-  location: {
-    type: "Point";
-    coordinates: [number, number];
-  };
-};
-
-type AgentOrder = {
-  orderId: string;
-  orderNumber: string;
-  orderDate: string;
-  AssignedDate: string;
-  pickupDate?: string;
-  hubHandoverDate?: string;
-  orderStatus: OrderStatus;
-
-  items: {
-    bookId: string;
-    bookName: string;
-    author: string;
-    coverImage: string;
-    quantity: number;
-  }[];
-
-  sellerDetails: {
-    name: string;
-    phoneNumber: string;
-    sellerId: string;
-    address: Address[];
-  };
-
-  hubDetails?: HubDetails;
-};
-
-const orderResponse: AgentOrder[] = [
-  {
-    orderId: "6a688d51fee54ef848305cbe",
-    orderNumber: "ORD1785236817175",
-    orderDate: "2026-07-28T11:06:57.183Z",
-    AssignedDate: "2026-07-28",
-    orderStatus: "Assigned",
-
-    items: [
-      {
-        bookId: "6a3cfcad1d1789437feae0a5",
-        bookName: "Beloved",
-        author: "Toni Morrison",
-        coverImage:
-          "https://res.cloudinary.com/dlggszqj9/image/upload/v1782381739/BookImages/Beloved-cover.webp.jpg",
-        quantity: 1,
-      },
-    ],
-
-    sellerDetails: {
-      name: "Test",
-      phoneNumber: "1234567890",
-      sellerId: "6a3ceeb6fe292d89939928de",
-
-      address: [
-        {
-          name: "Ambedkar circle",
-          type: "home",
-          street: "Navirman Nagar",
-          city: "Hyderabad",
-          state: "Telangana",
-          zipCode: "500096",
-          country: "India",
-          phone: "4083285219",
-
-          location: {
-            type: "Point",
-            coordinates: [
-              78.42261018992527,
-              17.425446193556382,
-            ],
-          },
-        },
-      ],
-    },
-  },
-
-  {
-    orderId: "6a684f72bce6baf7647e58d7",
-    orderNumber: "ORD1785220978266",
-    orderDate: "2026-07-24T11:06:57.183Z",
-    AssignedDate: "2026-07-25",
-    pickupDate: "2026-07-26",
-    orderStatus: "Picked Up",
-
-    items: [
-      {
-        bookId: "6a3cfcad1d1789437feae0a5",
-        bookName: "Beloved",
-        author: "Toni Morrison",
-        coverImage:
-          "https://res.cloudinary.com/dlggszqj9/image/upload/v1782381739/BookImages/Beloved-cover.webp.jpg",
-        quantity: 1,
-      },
-    ],
-
-    sellerDetails: {
-      name: "Test",
-      phoneNumber: "1234567890",
-      sellerId: "6a3ceeb6fe292d89939928de",
-
-      address: [
-        {
-          name: "",
-          type: "home",
-          street: "Road No. 2",
-          city: "Hyderabad",
-          state: "Telangana",
-          zipCode: "500096",
-          country: "India",
-          phone: "7777777777",
-
-          location: {
-            type: "Point",
-            coordinates: [
-              78.42204959873321,
-              17.4259243184041,
-            ],
-          },
-        },
-      ],
-    },
-
-    hubDetails: {
-      hubId: "HYD-HUB-01",
-      name: "Hyderabad Central Hub",
-      address: "Madhapur",
-      city: "Hyderabad",
-      state: "Telangana",
-      distance: "5.2 km",
-
-      location: {
-        type: "Point",
-        coordinates: [
-          78.3915,
-          17.4485,
-        ],
-      },
-    },
-  },
-];
+// ============================================================
+// STATUS META
+// ============================================================
 
 const STATUS_META: Record<
   OrderStatus,
@@ -201,20 +36,14 @@ const STATUS_META: Record<
     dot: "bg-blue-500",
   },
 
-  "Picked Up": {
-    label: "Picked Up",
-    badge: "bg-amber-50 text-amber-700",
-    dot: "bg-amber-500",
+  "Pickup Successful": {
+    label: "Pickup Successful",
+    badge: "bg-emerald-50 text-emerald-700",
+    dot: "bg-emerald-500",
   },
 
-  "Going to Hub": {
-    label: "Going to Hub",
-    badge: "bg-sky-50 text-sky-700",
-    dot: "bg-sky-500",
-  },
-
-  "Handed Over to Hub": {
-    label: "Handed Over to Hub",
+  "Submitted to Admin": {
+    label: "Submitted to Admin",
     badge: "bg-indigo-50 text-indigo-700",
     dot: "bg-indigo-500",
   },
@@ -225,47 +54,64 @@ const STATUS_META: Record<
     dot: "bg-emerald-500",
   },
 
-  Cancelled: {
-    label: "Cancelled",
-    badge: "bg-rose-50 text-rose-700",
-    dot: "bg-rose-500",
+  "Assigned for Delivery": {
+    label: "Assigned for Delivery",
+    badge: "bg-violet-50 text-violet-700",
+    dot: "bg-violet-500",
+  },
+
+  "Collected from Hub": {
+    label: "Collected from Hub",
+    badge: "bg-cyan-50 text-cyan-700",
+    dot: "bg-cyan-500",
+  },
+
+  "Out for Delivery": {
+    label: "Out for Delivery",
+    badge: "bg-blue-50 text-blue-700",
+    dot: "bg-blue-500",
+  },
+
+  Delivered: {
+    label: "Delivered",
+    badge: "bg-emerald-50 text-emerald-700",
+    dot: "bg-emerald-500",
   },
 };
 
+// ============================================================
+// TABS
+// ============================================================
+
 const TABS = [
-  {
-    key: "all",
-    label: "All Orders",
-  },
-  {
-    key: "Assigned",
-    label: "Assigned",
-  },
-  {
-    key: "Out for Pickup",
-    label: "Out for Pickup",
-  },
-  {
-    key: "Picked Up",
-    label: "Picked Up",
-  },
-  {
-    key: "Going to Hub",
-    label: "Going to Hub",
-  },
-  {
-    key: "Completed",
-    label: "Completed",
-  },
+  { key: "all", label: "All Orders" },
+  { key: "Assigned", label: "Assigned" },
+  { key: "Out for Pickup", label: "Out for Pickup" },
+  { key: "Pickup Successful", label: "Pickup Successful" },
+  { key: "Submitted to Admin", label: "Submitted to Admin" },
+  { key: "Completed", label: "Completed" },
+  { key: "Assigned for Delivery", label: "Assigned for Delivery" },
+  { key: "Out for Delivery", label: "Out for Delivery" },
+  { key: "Delivered", label: "Delivered" },
 ] as const;
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("en-IN", {
+// ============================================================
+// DATE
+// ============================================================
+
+const formatDate = (date?: string) => {
+  if (!date) return "";
+
+  return new Date(date).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 };
+
+// ============================================================
+// COMPONENT
+// ============================================================
 
 const AgentOrders = () => {
   const [orders, setOrders] =
@@ -273,6 +119,10 @@ const AgentOrders = () => {
 
   const [activeTab, setActiveTab] =
     useState<(typeof TABS)[number]["key"]>("all");
+
+  // ============================================================
+  // COUNTS
+  // ============================================================
 
   const counts = useMemo(() => {
     const result: Record<string, number> = {
@@ -287,6 +137,10 @@ const AgentOrders = () => {
     return result;
   }, [orders]);
 
+  // ============================================================
+  // FILTER
+  // ============================================================
+
   const filteredOrders = useMemo(() => {
     if (activeTab === "all") {
       return orders;
@@ -297,9 +151,13 @@ const AgentOrders = () => {
     );
   }, [activeTab, orders]);
 
+  // ============================================================
+  // STATUS CHANGE
+  // ============================================================
+
   const handleStatusChange = (
     orderId: string,
-    status: "Assigned" | "Out for Pickup"
+    status: OrderStatus
   ) => {
     setOrders((currentOrders) =>
       currentOrders.map((order) =>
@@ -312,13 +170,256 @@ const AgentOrders = () => {
       )
     );
 
-    // API example:
+    // TODO:
     // updateAgentOrderStatus(orderId, status);
   };
 
+  // ============================================================
+  // LOCATION
+  // ============================================================
+
+  const renderLocation = (order: AgentOrder) => {
+    // ----------------------------------------------------------
+    // SELLER → HUB
+    // Assigned / Out for Pickup
+    // ----------------------------------------------------------
+
+    if (
+      order.deliveryType === "SELLER_TO_HUB" &&
+      order.sellerDetails &&
+      (order.orderStatus === "Assigned" ||
+        order.orderStatus === "Out for Pickup")
+    ) {
+      const address =
+        order.sellerDetails.address;
+
+      return (
+        <div className="mt-4 flex items-start gap-2">
+          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+
+          <div>
+            <Rb_Text className="text-xs font-medium text-gray-400">
+              Pickup Location
+            </Rb_Text>
+
+            <Rb_Text className="text-sm text-gray-700">
+              {address.street},{" "}
+              {address.city},{" "}
+              {address.state}
+            </Rb_Text>
+
+            <Rb_Text className="text-xs text-gray-400">
+              {address.zipCode}
+            </Rb_Text>
+          </div>
+        </div>
+      );
+    }
+
+    // ----------------------------------------------------------
+    // SELLER → HUB
+    // Pickup Successful / Submitted / Completed
+    // Show HUB instead of seller
+    // ----------------------------------------------------------
+
+    if (
+      order.deliveryType === "SELLER_TO_HUB" &&
+      order.hubDetails &&
+      (order.orderStatus === "Pickup Successful" ||
+        order.orderStatus === "Submitted to Admin" ||
+        order.orderStatus === "Completed")
+    ) {
+      return (
+        <div className="mt-4 flex items-start gap-2">
+          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+
+          <div>
+            <Rb_Text className="text-xs font-medium text-gray-400">
+              Hub
+            </Rb_Text>
+
+            <Rb_Text className="text-sm font-medium text-gray-800">
+              {order.hubDetails.name}
+            </Rb_Text>
+
+            <Rb_Text className="text-sm text-gray-600">
+              {order.hubDetails.address},{" "}
+              {order.hubDetails.city}
+            </Rb_Text>
+          </div>
+        </div>
+      );
+    }
+
+    // ----------------------------------------------------------
+    // HUB → USER
+    // ----------------------------------------------------------
+
+    if (
+      order.deliveryType === "HUB_TO_USER" &&
+      order.userDetails &&
+      (order.orderStatus === "Assigned for Delivery" ||
+        order.orderStatus === "Out for Delivery")
+    ) {
+      const address =
+        order.userDetails.address;
+
+      return (
+        <div className="mt-4 flex items-start gap-2">
+          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+
+          <div>
+            <Rb_Text className="text-xs font-medium text-gray-400">
+              Delivery Location
+            </Rb_Text>
+
+            <Rb_Text className="text-sm text-gray-700">
+              {address.street},{" "}
+              {address.city},{" "}
+              {address.state}
+            </Rb_Text>
+
+            <Rb_Text className="text-xs text-gray-400">
+              {address.zipCode}
+            </Rb_Text>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  // ============================================================
+  // STATUS UI
+  // ============================================================
+
+  const renderStatus = (order: AgentOrder) => {
+    // ----------------------------------------------------------
+    // SELLER → HUB
+    // Assigned → Out for Pickup
+    // ----------------------------------------------------------
+
+    if (
+      order.deliveryType === "SELLER_TO_HUB" &&
+      order.orderStatus === "Assigned"
+    ) {
+      return (
+        <div className="shrink-0">
+          <Dropdown
+            options={[
+              {
+                label: "Assigned",
+                value: "Assigned",
+              },
+              {
+                label: "Out for Pickup",
+                value: "Out for Pickup",
+              },
+            ]}
+            value={order.orderStatus}
+            onChange={(value) =>
+              handleStatusChange(
+                order.orderId,
+                value as OrderStatus
+              )
+            }
+          />
+        </div>
+      );
+    }
+
+    // ----------------------------------------------------------
+    // HUB → USER
+    // Assigned for Delivery → Out for Delivery
+    // ----------------------------------------------------------
+
+    if (
+      order.deliveryType === "HUB_TO_USER" &&
+      order.orderStatus === "Assigned for Delivery"
+    ) {
+      return (
+        <div className="shrink-0">
+          <Dropdown
+            options={[
+              {
+                label: "Assigned for Delivery",
+                value: "Assigned for Delivery",
+              },
+              {
+                label: "Out for Delivery",
+                value: "Out for Delivery",
+              },
+            ]}
+            value={order.orderStatus}
+            onChange={(value) =>
+              handleStatusChange(
+                order.orderId,
+                value as OrderStatus
+              )
+            }
+          />
+        </div>
+      );
+    }
+
+    // ----------------------------------------------------------
+    // NORMAL STATUS BADGE
+    // ----------------------------------------------------------
+
+    const meta = STATUS_META[order.orderStatus];
+
+    // Safety fallback
+    if (!meta) {
+      return (
+        <span className="inline-flex shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+          {order.orderStatus}
+        </span>
+      );
+    }
+
+    return (
+      <span
+        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${meta.badge}`}
+      >
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${meta.dot}`}
+        />
+
+        {meta.label}
+      </span>
+    );
+  };
+
+  // ============================================================
+  // NAVIGATE TO DETAILS
+  // ============================================================
+
+  const openOrderDetails = (
+    orderId: string
+  ) => {
+    window.history.pushState(
+      {},
+      "",
+      `/agent-orders/${orderId}`
+    );
+
+    window.dispatchEvent(
+      new PopStateEvent("popstate")
+    );
+  };
+
+  // ============================================================
+  // UI
+  // ============================================================
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
-      {/* Header */}
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
       <div className="mb-6">
         <h4 className="text-xl font-semibold text-gray-900">
           My Orders
@@ -329,17 +430,25 @@ const AgentOrders = () => {
         </p>
       </div>
 
-      {/* Tabs */}
+      {/* ======================================================
+          TABS
+      ====================================================== */}
+
       <div className="mb-6 flex overflow-x-auto border-b border-gray-200">
         {TABS.map((tab) => {
-          const isActive = activeTab === tab.key;
-          const count = counts[tab.key] || 0;
+          const isActive =
+            activeTab === tab.key;
+
+          const count =
+            counts[tab.key] || 0;
 
           return (
             <button
               key={tab.key}
               type="button"
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() =>
+                setActiveTab(tab.key)
+              }
               className={`relative flex shrink-0 items-center gap-1.5 px-4 py-3 text-sm font-medium transition ${
                 isActive
                   ? "text-violet-700"
@@ -366,7 +475,10 @@ const AgentOrders = () => {
         })}
       </div>
 
-      {/* Orders */}
+      {/* ======================================================
+          ORDERS
+      ====================================================== */}
+
       <div className="space-y-3">
         {filteredOrders.length === 0 && (
           <div className="rounded-xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-500">
@@ -376,35 +488,32 @@ const AgentOrders = () => {
 
         {filteredOrders.map((order) => {
           const item = order.items[0];
-          const address = order.sellerDetails.address[0];
-          const meta = STATUS_META[order.orderStatus];
-
-          const showPickupAddress =
-            order.orderStatus === "Assigned" ||
-            order.orderStatus === "Out for Pickup";
-
-          const showHub =
-            order.orderStatus === "Picked Up" ||
-            order.orderStatus === "Going to Hub" ||
-            order.orderStatus === "Handed Over to Hub";
 
           return (
             <div
               key={order.orderId}
               className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
             >
-              {/* Main */}
+              {/* ==================================================
+                  MAIN
+              ================================================== */}
+
               <div className="flex gap-4">
-                {/* Book */}
+
+                {/* BOOK IMAGE */}
+
                 <img
                   src={item.coverImage}
                   alt={item.bookName}
                   className="h-20 w-16 shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
                 />
 
-                {/* Details */}
+                {/* DETAILS */}
+
                 <div className="min-w-0 flex-1">
-                  {/* Header */}
+
+                  {/* HEADER */}
+
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Rb_Text className="text-sm font-semibold text-gray-900">
@@ -423,115 +532,35 @@ const AgentOrders = () => {
                       </Rb_Text>
                     </div>
 
-                    {/* Status */}
-                    {order.orderStatus === "Assigned" ? (
-                      <div className="shrink-0">
-                        <Dropdown
-                          options={[
-                            {
-                              label: "Assigned",
-                              value: "Assigned",
-                            },
-                            {
-                              label: "Out for Pickup",
-                              value: "Out for Pickup",
-                            },
-                          ]}
-                          value={order.orderStatus}
-                          onChange={(value) =>
-                            handleStatusChange(
-                              order.orderId,
-                              value as
-                                | "Assigned"
-                                | "Out for Pickup"
-                            )
-                          }
-                        />
-                      </div>
-                    ) : (
-                      <span
-                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${meta.badge}`}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${meta.dot}`}
-                        />
-
-                        {meta.label}
-                      </span>
-                    )}
+                    {renderStatus(order)}
                   </div>
 
-                  {/* Seller Pickup */}
-                  {showPickupAddress && (
-                    <div className="mt-4 flex items-start gap-2">
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                  {/* LOCATION */}
 
-                      <div>
-                        <Rb_Text className="text-xs font-medium text-gray-400">
-                          Pickup Location
-                        </Rb_Text>
-
-                        <Rb_Text className="text-sm text-gray-700">
-                          {address.street
-                            ? `${address.street}, `
-                            : ""}
-                          {address.city},{" "}
-                          {address.state}
-                        </Rb_Text>
-
-                        <Rb_Text className="text-xs text-gray-400">
-                          {address.zipCode}
-                        </Rb_Text>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Hub */}
-                  {showHub && order.hubDetails && (
-                    <div className="mt-4 flex items-start gap-2">
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
-
-                      <div>
-                        <Rb_Text className="text-xs font-medium text-gray-400">
-                          Nearest Hub
-                        </Rb_Text>
-
-                        <Rb_Text className="text-sm font-medium text-gray-800">
-                          {order.hubDetails.name}
-                        </Rb_Text>
-
-                        <Rb_Text className="text-sm text-gray-600">
-                          {order.hubDetails.address},{" "}
-                          {order.hubDetails.city}
-                        </Rb_Text>
-
-                        {order.hubDetails.distance && (
-                          <Rb_Text className="text-xs text-gray-400">
-                            {order.hubDetails.distance} away
-                          </Rb_Text>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  {renderLocation(order)}
                 </div>
               </div>
 
-              {/* Footer */}
+              {/* ==================================================
+                  FOOTER
+              ================================================== */}
+
               <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
                 <Rb_Text className="text-xs text-gray-400">
-                  {order.pickupDate &&
-                  order.orderStatus !== "Assigned"
-                    ? `Picked up ${formatDate(
-                        order.pickupDate
-                      )}`
-                    : `Assigned ${formatDate(
-                        order.AssignedDate
-                      )}`}
+                  Assigned{" "}
+                  {formatDate(
+                    order.assignedDate
+                  )}
                 </Rb_Text>
 
                 <Rb_Button
                   variant="primary"
                   className="px-3 py-1.5 text-xs"
+                  onClick={() =>
+                    openOrderDetails(
+                      order.orderId
+                    )
+                  }
                 >
                   View Details
                 </Rb_Button>
@@ -545,3 +574,4 @@ const AgentOrders = () => {
 };
 
 export default AgentOrders;
+
