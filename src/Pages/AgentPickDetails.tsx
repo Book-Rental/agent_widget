@@ -376,7 +376,7 @@ const AgentPickDetails = () => {
     window.history.pushState(
       {},
       "",
-      `/agent-orders/${order.orderId}/pickup-verification`
+      `/agent-orders/ORD-100234/pickup-verification`
     );
 
     window.dispatchEvent(

@@ -395,19 +395,7 @@ const AgentOrders = () => {
   // NAVIGATE TO DETAILS
   // ============================================================
 
-  const openOrderDetails = (
-    orderId: string
-  ) => {
-    window.history.pushState(
-      {},
-      "",
-      `/agent-orders/${orderId}`
-    );
-
-    window.dispatchEvent(
-      new PopStateEvent("popstate")
-    );
-  };
+  const navigateTo = (path: string) => { window.history.pushState({}, "", path); window.dispatchEvent(new PopStateEvent("popstate")); };
 
   // ============================================================
   // UI
@@ -553,17 +541,7 @@ const AgentOrders = () => {
                   )}
                 </Rb_Text>
 
-                <Rb_Button
-                  variant="primary"
-                  className="px-3 py-1.5 text-xs"
-                  onClick={() =>
-                    openOrderDetails(
-                      order.orderId
-                    )
-                  }
-                >
-                  View Details
-                </Rb_Button>
+                <Rb_Button variant="primary" onClick={() => navigateTo(`/agent-orders/${order.orderId}`)} > View Details </Rb_Button>
               </div>
             </div>
           );

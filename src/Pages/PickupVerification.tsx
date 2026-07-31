@@ -15,6 +15,15 @@ const PickupVerification = ({ pickup }: PickupVerificationProps) => {
 
   const handleProceed = () => {
     console.log("Proceed with Pickup", pickup.pickupType);
+     window.history.pushState(
+      {},
+      "",
+      `/confirmation-page`
+    );
+
+    window.dispatchEvent(
+      new PopStateEvent("popstate")
+    );
   };
 
   return (
