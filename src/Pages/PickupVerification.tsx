@@ -1,10 +1,10 @@
 import { Rb_Button } from "@rentbook/rentbook-ui-lib";
-
 import { PickupDetails } from "../Types/pickup";
-import PickupBookInfo from "../Components/sellerPickup/PickupBookInfo";
-import ReferencePhotosSection from "../Components/sellerPickup/ReferencePhotosSection";
-import BookPhotoUpload from "../Components/sellerPickup/BookPhotoUpload";
-import BookCondition from "../Components/sellerPickup/BookCondition";
+import { useState } from "react";
+import BookCondition from "../components/sellerPickup/BookCondition";
+import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
+import PickupBookInfo from "../components/sellerPickup/PickupBookInfo";
+import ReferencePhotosSection from "../components/sellerPickup/ReferencePhotosSection";
 
 interface PickupVerificationProps {
   pickup: PickupDetails;
@@ -12,7 +12,7 @@ interface PickupVerificationProps {
 
 const PickupVerification = ({ pickup }: PickupVerificationProps) => {
   const isReturnPickup = pickup.pickupType === "RETURN_PICKUP";
-
+  const [photosComplete, setPhotosComplete] = useState(false);
   const handleProceed = () => {
     console.log("Proceed with Pickup", pickup.pickupType);
      window.history.pushState(
@@ -49,12 +49,13 @@ const PickupVerification = ({ pickup }: PickupVerificationProps) => {
         />
       )}
 
-      <BookPhotoUpload />
+      <BookPhotoUpload onChange={(data) => setPhotosComplete(data.isComplete)} />
       <BookCondition />
       <div className="flex justify-end pt-2">
         <Rb_Button
           variant="primary"
           onClick={handleProceed}
+          disabled={!photosComplete}
           className="min-w-[200px]"
         >
           Proceed with Pickup

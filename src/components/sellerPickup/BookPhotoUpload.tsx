@@ -6,7 +6,7 @@ import DamagePhotoSection from "./DamagePhotoSection";
 
 
 interface BookPhotoUploadProps {
-  onChange?: (data: { requiredPhotos: RequiredPhotos; damagePhotos: File[] }) => void;
+  onChange?: (data: { requiredPhotos: RequiredPhotos; damagePhotos: File[]; isComplete: boolean }) => void;
 }
 
 const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
@@ -18,9 +18,11 @@ const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
 
   const [hasDamage, setHasDamage] = useState(false);
   const [damagePhotos, setDamagePhotos] = useState<File[]>([]);
+  const allRequiredUploaded = requiredPhotos.front !== null && requiredPhotos.back !== null && requiredPhotos.spine !== null;
 
   const emitChange = (next: RequiredPhotos, damage: File[]) => {
-    onChange?.({ requiredPhotos: next, damagePhotos: damage });
+    const isComplete = next.front !== null && next.back !== null && next.spine !== null;
+    onChange?.({ requiredPhotos: next, damagePhotos: damage, isComplete });
   };
 
 
@@ -75,6 +77,11 @@ const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
         onPhotoSelected={handleRequiredPhotoSelected}
         onPhotoRemoved={handleRequiredPhotoRemoved}
       />
+      {!allRequiredUploaded && (
+        <p className="mt-2 text-xs text-red-500">
+          ⚠️ Please upload all 3 required photos before proceeding
+        </p>
+      )}
 
       <DamagePhotoSection
         hasDamage={hasDamage}

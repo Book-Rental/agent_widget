@@ -38,13 +38,16 @@ const DamagePhotoSection = ({
         <button
           type="button"
           onClick={onToggleDamage}
-          className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+          className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
             hasDamage
-              ? "border-red-300 bg-red-50 text-red-600"
-              : "border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100"
+              ? "border-red-400 bg-red-100 text-red-700 hover:bg-red-200"
+              : "border-amber-200 bg-amber-100 text-amber-700 hover:bg-amber-200 hover:border-amber-300 shadow-sm"
           }`}
         >
-          <FiAlertTriangle size={16} />
+          <FiAlertTriangle
+            size={16}
+            className={hasDamage ? "text-red-600" : "text-amber-600"}
+          />
           {hasDamage ? "Damage Reported" : "Report Damage"}
         </button>
       </div>

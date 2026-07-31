@@ -66,3 +66,44 @@ export const returnPickupData: PickupDetails = {
     damagePhotos: [],
   },
 };
+
+export const deliveredBookData = {
+  orderId: "ORD-100987",
+
+  deliveryStatus: "DELIVERED",
+
+  deliveredAt: "31 Jul 2026, 4:15 PM",
+
+  deliveredBy: {
+    id: "AG-101",
+    name: "Ram Kumar",
+    phone: "+91 9876543210",
+  },
+
+  receiver: {
+    name: "ABC Book Store",
+    type: "Seller",
+    phone: "+91 9876543210",
+  },
+
+  verification: {
+    frontVerified: true,
+    backVerified: true,
+    spineVerified: true,
+    damageFound: false,
+    damagePhotos: [],
+  },
+
+  notes:
+    "Book handed over successfully. Receiver verified the condition.",
+
+  book: {
+    id: "BK-7895",
+    name: "Atomic Habits",
+    author: "James Clear",
+    language: "English",
+    edition: "3rd Edition",
+    coverImage:
+      "https://images-na.ssl-images-amazon.com/images/I/91bYsX41DVL.jpg",
+  },
+};
