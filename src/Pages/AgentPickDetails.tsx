@@ -12,6 +12,7 @@ import {
 import {
   Dropdown,
   Rb_Button,
+  Rb_Image,
   Rb_Text,
 } from "@rentbook/rentbook-ui-lib";
 
@@ -798,7 +799,7 @@ const AgentPickDetails = () => {
           </div>
 
           <div className="flex gap-4">
-            <img
+            <Rb_Image
               src={item.coverImage}
               alt={item.bookName}
               className="h-24 w-[68px] shrink-0 rounded-lg object-cover ring-1 ring-gray-200"

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
   Dropdown,
   Rb_Button,
+  Rb_Image,
   Rb_Text,
 } from "@rentbook/rentbook-ui-lib";
 
@@ -490,7 +491,7 @@ const AgentOrders = () => {
 
                 {/* BOOK IMAGE */}
 
-                <img
+                <Rb_Image
                   src={item.coverImage}
                   alt={item.bookName}
                   className="h-20 w-16 shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
