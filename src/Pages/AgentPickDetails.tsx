@@ -15,9 +15,12 @@ import ContactCard from "../components/pickDetails/ContactCard";
 import ProgressTimeline from "../components/pickDetails/ProgressTimeline";
 import ActionCard from "../components/pickDetails/ActionCard";
 import { LocationCard } from "../components/pickDetails/LocationCard";
-import { LocationStats } from "../components/pickDetails/LocationStats";
 
-const AgentPickDetails = () => {
+type AgentPickDetailsProps = {
+  orderId?: string;
+};
+
+const AgentPickDetails = ({orderId}: AgentPickDetailsProps) => {
   const shipmentId = window.location.pathname.split("/").pop() ?? "";
 
   const { data: order, isLoading, isError } =
@@ -102,8 +105,8 @@ const { distance } = useAgentLocation(coordinates);
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-6">
-      <div className="mx-auto max-w-3xl">
+    <div className="min-h-screen px-4 py-6">
+      <div className="max-w-3xl">
 
       <PageHeader
   title={

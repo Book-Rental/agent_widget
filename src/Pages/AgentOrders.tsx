@@ -13,10 +13,6 @@ import type {
 
 import { useAgentOrders } from "../hooks/useAgentOrders";
 
-// ============================================================
-// STATUS META
-// ============================================================
-
 const STATUS_META: Partial<
   Record<
     OrderStatus,
@@ -75,9 +71,6 @@ const STATUS_META: Partial<
     dot: "bg-emerald-500",
   },
 };
-// ============================================================
-// TABS
-// ============================================================
 
 const TABS = [
   { key: "all", label: "All Orders" },
@@ -90,10 +83,6 @@ const TABS = [
   { key: "Delivered", label: "Delivered" },
 ] as const;
 
-// ============================================================
-// DATE
-// ============================================================
-
 const formatDate = (date?: string) => {
   if (!date) return "";
 
@@ -104,10 +93,6 @@ const formatDate = (date?: string) => {
   });
 };
 
-// ============================================================
-// COMPONENT
-// ============================================================
-
 const AgentOrders = () => {
   const agentId = "6a6b0610edbee86f6665550d";
   const [activeTab, setActiveTab] =
@@ -117,14 +102,6 @@ const AgentOrders = () => {
     isPending,
     isError,
   } = useAgentOrders(agentId);
-
-
-
-
-
-  // ============================================================
-  // COUNTS
-  // ============================================================
 
   const counts = useMemo(() => {
     const result: Record<string, number> = {
@@ -139,9 +116,6 @@ const AgentOrders = () => {
     return result;
   }, [orders]);
 
-  // ============================================================
-  // FILTER
-  // ============================================================
 
   const filteredOrders = useMemo(() => {
     if (activeTab === "all") {
@@ -153,9 +127,6 @@ const AgentOrders = () => {
     );
   }, [activeTab, orders]);
 
-  // ============================================================
-  // STATUS CHANGE
-  // ============================================================
   if (isPending) return <div>Loading...</div>;
   if (isError) return <div>Something went wrong</div>
   const handleStatusChange = (
@@ -164,25 +135,14 @@ const AgentOrders = () => {
   ) => {
     console.log("Order:", orderId);
     console.log("Status:", status);
-
-    // TODO: Call your update status API here
   };
 
-  // ============================================================
-  // LOCATION
-  // ============================================================
-
   const renderLocation = (order: AgentOrder) => {
-    // ----------------------------------------------------------
-    // SELLER → HUB
-    // Assigned / Out for Pickup
-    // ----------------------------------------------------------
-
     if (
       order.deliveryType === "SELLER_TO_HUB" &&
       order.sellerDetails &&
       (order.orderStatus === "Pickup Assigned" ||
-order.orderStatus === "Out For Pickup")
+        order.orderStatus === "Out For Pickup")
     ) {
       const address =
         order.sellerDetails.address;
@@ -210,18 +170,12 @@ order.orderStatus === "Out For Pickup")
       );
     }
 
-    // ----------------------------------------------------------
-    // SELLER → HUB
-    // Pickup Successful / Submitted / Completed
-    // Show HUB instead of seller
-    // ----------------------------------------------------------
-
     if (
       order.deliveryType === "SELLER_TO_HUB" &&
       order.hubDetails &&
       (order.orderStatus === "Pickup Completed" ||
-order.orderStatus === "Arrived At Origin Hub" ||
-order.orderStatus === "Sorting Completed")
+        order.orderStatus === "Arrived At Origin Hub" ||
+        order.orderStatus === "Sorting Completed")
     ) {
       return (
         <div className="mt-4 flex items-start gap-2">
@@ -245,15 +199,11 @@ order.orderStatus === "Sorting Completed")
       );
     }
 
-    // ----------------------------------------------------------
-    // HUB → USER
-    // ----------------------------------------------------------
-
     if (
       order.deliveryType === "HUB_TO_USER" &&
       order.userDetails &&
       (order.orderStatus === "Delivery Agent Assigned" ||
-order.orderStatus === "Out For Delivery")
+        order.orderStatus === "Out For Delivery")
     ) {
       const address =
         order.userDetails.address;
@@ -284,86 +234,67 @@ order.orderStatus === "Out For Delivery")
     return null;
   };
 
-  // ============================================================
-  // STATUS UI
-  // ============================================================
 
   const renderStatus = (order: AgentOrder) => {
-    // ----------------------------------------------------------
-    // SELLER → HUB
-    // Assigned → Out for Pickup
-    // ----------------------------------------------------------
-
     if (
       order.deliveryType === "SELLER_TO_HUB" &&
       order.orderStatus === "Pickup Assigned"
     ) {
       return (
         <div className="shrink-0">
-         <Dropdown
- options={[
-   {
-     label:"Pickup Assigned",
-     value:"Pickup Assigned",
-   },
-   {
-     label:"Out For Pickup",
-     value:"Out For Pickup",
-   }
- ]}
- value={order.orderStatus}
- onChange={(value)=>
-   handleStatusChange(
-     order.orderId,
-     value as OrderStatus
-   )
- }
-/>
+          <Dropdown
+            options={[
+              {
+                label: "Pickup Assigned",
+                value: "Pickup Assigned",
+              },
+              {
+                label: "Out For Pickup",
+                value: "Out For Pickup",
+              }
+            ]}
+            value={order.orderStatus}
+            onChange={(value) =>
+              handleStatusChange(
+                order.orderId,
+                value as OrderStatus
+              )
+            }
+          />
         </div>
       );
     }
 
-    // ----------------------------------------------------------
-    // HUB → USER
-    // Assigned for Delivery → Out for Delivery
-    // ----------------------------------------------------------
-
     if (
       order.deliveryType === "HUB_TO_USER" &&
-     order.orderStatus === "Delivery Agent Assigned"
+      order.orderStatus === "Delivery Agent Assigned"
     ) {
       return (
         <div className="shrink-0">
           <Dropdown
- options={[
-  {
-    label:"Delivery Agent Assigned",
-    value:"Delivery Agent Assigned",
-  },
-  {
-    label:"Out For Delivery",
-    value:"Out For Delivery",
-  }
- ]}
- value={order.orderStatus}
- onChange={(value)=>
-   handleStatusChange(
-     order.orderId,
-     value as OrderStatus
-   )
- }
-/>
+            options={[
+              {
+                label: "Delivery Agent Assigned",
+                value: "Delivery Agent Assigned",
+              },
+              {
+                label: "Out For Delivery",
+                value: "Out For Delivery",
+              }
+            ]}
+            value={order.orderStatus}
+            onChange={(value) =>
+              handleStatusChange(
+                order.orderId,
+                value as OrderStatus
+              )
+            }
+          />
         </div>
       );
     }
 
-    // ----------------------------------------------------------
-    // NORMAL STATUS BADGE
-    // ----------------------------------------------------------
-
     const meta = STATUS_META[order.orderStatus];
-
-    // Safety fallback
     if (!meta) {
       return (
         <span className="inline-flex shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
@@ -385,22 +316,10 @@ order.orderStatus === "Out For Delivery")
     );
   };
 
-  // ============================================================
-  // NAVIGATE TO DETAILS
-  // ============================================================
-
   const navigateTo = (path: string) => { window.history.pushState({}, "", path); window.dispatchEvent(new PopStateEvent("popstate")); };
 
-  // ============================================================
-  // UI
-  // ============================================================
-
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
-
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
+    <div className="w-full max-w-5xl px-4 py-6 sm:px-6">
 
       <div className="mb-6">
         <h4 className="text-xl font-semibold text-gray-900">
@@ -411,10 +330,6 @@ order.orderStatus === "Out For Delivery")
           Manage and track your assigned pickup orders
         </p>
       </div>
-
-      {/* ======================================================
-          TABS
-      ====================================================== */}
 
       <div className="mb-6 flex overflow-x-auto border-b border-gray-200">
         {TABS.map((tab) => {
@@ -432,16 +347,16 @@ order.orderStatus === "Out For Delivery")
                 setActiveTab(tab.key)
               }
               className={`relative flex shrink-0 items-center gap-1.5 px-4 py-3 text-sm font-medium transition ${isActive
-                  ? "text-violet-700"
-                  : "text-gray-500 hover:text-gray-700"
+                ? "text-violet-700"
+                : "text-gray-500 hover:text-gray-700"
                 }`}
             >
               {tab.label}
 
               <span
                 className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${isActive
-                    ? "bg-violet-100 text-violet-700"
-                    : "bg-gray-100 text-gray-500"
+                  ? "bg-violet-100 text-violet-700"
+                  : "bg-gray-100 text-gray-500"
                   }`}
               >
                 {count}
@@ -454,10 +369,6 @@ order.orderStatus === "Out For Delivery")
           );
         })}
       </div>
-
-      {/* ======================================================
-          ORDERS
-      ====================================================== */}
 
       <div className="space-y-3">
         {filteredOrders.length === 0 && (
@@ -474,26 +385,13 @@ order.orderStatus === "Out For Delivery")
               key={order.orderId}
               className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
             >
-              {/* ==================================================
-                  MAIN
-              ================================================== */}
-
               <div className="flex gap-4">
-
-                {/* BOOK IMAGE */}
-
                 <Rb_Image
                   src={item?.coverImage || "/images/book-placeholder.png"}
                   alt={item?.bookName || "Book"}
                   className="h-20 w-16 shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
                 />
-
-                {/* DETAILS */}
-
                 <div className="min-w-0 flex-1">
-
-                  {/* HEADER */}
-
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Rb_Text className="text-sm font-semibold text-gray-900">
@@ -520,10 +418,6 @@ order.orderStatus === "Out For Delivery")
                   {renderLocation(order)}
                 </div>
               </div>
-
-              {/* ==================================================
-                  FOOTER
-              ================================================== */}
 
               <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
                 <Rb_Text className="text-xs text-gray-400">
