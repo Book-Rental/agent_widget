@@ -16,15 +16,28 @@ export type Address = {
 };
 
 export type OrderStatus =
-  | "Assigned"
-  | "Out for Pickup"
-  | "Pickup Successful"
-  | "Submitted to Admin"
-  | "Completed"
-  | "Assigned for Delivery"
-   | "Collected from Hub"
-  | "Out for Delivery"
-  | "Delivered";
+  | "Created"
+  | "Ready For Pickup"
+  | "Pickup Assigned"
+  | "Out For Pickup"
+  | "Pickup Completed"
+  | "Arrived At Origin Hub"
+  | "Sorting Completed"
+  | "In Transit"
+  | "Arrived At Destination Hub"
+  | "Delivery Agent Assigned"
+  | "Out For Delivery"
+  | "Delivered"
+  | "Delivery Failed"
+  | "Return Initiated"
+  | "Returned"
+  | "Cancelled";
+
+export type ShipmentType =
+  | "Forward"
+  | "Return"
+  | "Exchange";
+
 
 export type DeliveryType =
   | "SELLER_TO_HUB"
@@ -96,6 +109,9 @@ export type AgentOrder = {
   orderNumber: string;
   orderDate: string;
 
+   shipmentType: ShipmentType;
+
+  // Frontend agent flow
   deliveryType: DeliveryType;
 
   assignedDate?: string;
@@ -123,4 +139,12 @@ export type AgentOrder = {
   pickupVerification?: PickupVerification;
 
   deliveryVerification?: DeliveryVerification;
+  journeyHistory: JourneyHistory[];
+};
+
+export type JourneyHistory = {
+  event: string;
+  status: OrderStatus;
+  eventAt: string;
+  remarks?: string;
 };

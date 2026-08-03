@@ -11,64 +11,60 @@ import type {
   OrderStatus,
 } from "../Types/AgentTypes";
 
-import { orderResponse } from "../mock/OrderDetails";
+import { useAgentOrders } from "../hooks/useAgentOrders";
 
 // ============================================================
 // STATUS META
 // ============================================================
 
-const STATUS_META: Record<
-  OrderStatus,
-  {
-    label: string;
-    badge: string;
-    dot: string;
-  }
+const STATUS_META: Partial<
+  Record<
+    OrderStatus,
+    {
+      label: string;
+      badge: string;
+      dot: string;
+    }
+  >
 > = {
-  Assigned: {
-    label: "Assigned",
+  "Ready For Pickup": {
+    label: "Ready For Pickup",
+    badge: "bg-gray-50 text-gray-700",
+    dot: "bg-gray-500",
+  },
+
+  "Pickup Assigned": {
+    label: "Pickup Assigned",
     badge: "bg-violet-50 text-violet-700",
     dot: "bg-violet-500",
   },
 
-  "Out for Pickup": {
-    label: "Out for Pickup",
+  "Out For Pickup": {
+    label: "Out For Pickup",
     badge: "bg-blue-50 text-blue-700",
     dot: "bg-blue-500",
   },
 
-  "Pickup Successful": {
-    label: "Pickup Successful",
+  "Pickup Completed": {
+    label: "Pickup Completed",
     badge: "bg-emerald-50 text-emerald-700",
     dot: "bg-emerald-500",
   },
 
-  "Submitted to Admin": {
-    label: "Submitted to Admin",
+  "Sorting Completed": {
+    label: "Sorting Completed",
     badge: "bg-indigo-50 text-indigo-700",
     dot: "bg-indigo-500",
   },
 
-  Completed: {
-    label: "Completed",
-    badge: "bg-emerald-50 text-emerald-700",
-    dot: "bg-emerald-500",
-  },
-
-  "Assigned for Delivery": {
-    label: "Assigned for Delivery",
+  "Delivery Agent Assigned": {
+    label: "Delivery Agent Assigned",
     badge: "bg-violet-50 text-violet-700",
     dot: "bg-violet-500",
   },
 
-  "Collected from Hub": {
-    label: "Collected from Hub",
-    badge: "bg-cyan-50 text-cyan-700",
-    dot: "bg-cyan-500",
-  },
-
-  "Out for Delivery": {
-    label: "Out for Delivery",
+  "Out For Delivery": {
+    label: "Out For Delivery",
     badge: "bg-blue-50 text-blue-700",
     dot: "bg-blue-500",
   },
@@ -79,20 +75,18 @@ const STATUS_META: Record<
     dot: "bg-emerald-500",
   },
 };
-
 // ============================================================
 // TABS
 // ============================================================
 
 const TABS = [
   { key: "all", label: "All Orders" },
-  { key: "Assigned", label: "Assigned" },
-  { key: "Out for Pickup", label: "Out for Pickup" },
-  { key: "Pickup Successful", label: "Pickup Successful" },
-  { key: "Submitted to Admin", label: "Submitted to Admin" },
-  { key: "Completed", label: "Completed" },
-  { key: "Assigned for Delivery", label: "Assigned for Delivery" },
-  { key: "Out for Delivery", label: "Out for Delivery" },
+  { key: "Pickup Assigned", label: "Pickup Assigned" },
+  { key: "Out For Pickup", label: "Out For Pickup" },
+  { key: "Pickup Completed", label: "Pickup Completed" },
+  { key: "Sorting Completed", label: "Sorting Completed" },
+  { key: "Delivery Agent Assigned", label: "Delivery Agent Assigned" },
+  { key: "Out For Delivery", label: "Out For Delivery" },
   { key: "Delivered", label: "Delivered" },
 ] as const;
 
@@ -115,11 +109,18 @@ const formatDate = (date?: string) => {
 // ============================================================
 
 const AgentOrders = () => {
-  const [orders, setOrders] =
-    useState<AgentOrder[]>(orderResponse);
-
+  const agentId = "6a6b0610edbee86f6665550d";
   const [activeTab, setActiveTab] =
     useState<(typeof TABS)[number]["key"]>("all");
+  const {
+    data: orders = [],
+    isPending,
+    isError,
+  } = useAgentOrders(agentId);
+
+
+
+
 
   // ============================================================
   // COUNTS
@@ -155,24 +156,16 @@ const AgentOrders = () => {
   // ============================================================
   // STATUS CHANGE
   // ============================================================
-
+  if (isPending) return <div>Loading...</div>;
+  if (isError) return <div>Something went wrong</div>
   const handleStatusChange = (
     orderId: string,
     status: OrderStatus
   ) => {
-    setOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.orderId === orderId
-          ? {
-              ...order,
-              orderStatus: status,
-            }
-          : order
-      )
-    );
+    console.log("Order:", orderId);
+    console.log("Status:", status);
 
-    // TODO:
-    // updateAgentOrderStatus(orderId, status);
+    // TODO: Call your update status API here
   };
 
   // ============================================================
@@ -188,8 +181,8 @@ const AgentOrders = () => {
     if (
       order.deliveryType === "SELLER_TO_HUB" &&
       order.sellerDetails &&
-      (order.orderStatus === "Assigned" ||
-        order.orderStatus === "Out for Pickup")
+      (order.orderStatus === "Pickup Assigned" ||
+order.orderStatus === "Out For Pickup")
     ) {
       const address =
         order.sellerDetails.address;
@@ -226,9 +219,9 @@ const AgentOrders = () => {
     if (
       order.deliveryType === "SELLER_TO_HUB" &&
       order.hubDetails &&
-      (order.orderStatus === "Pickup Successful" ||
-        order.orderStatus === "Submitted to Admin" ||
-        order.orderStatus === "Completed")
+      (order.orderStatus === "Pickup Completed" ||
+order.orderStatus === "Arrived At Origin Hub" ||
+order.orderStatus === "Sorting Completed")
     ) {
       return (
         <div className="mt-4 flex items-start gap-2">
@@ -259,8 +252,8 @@ const AgentOrders = () => {
     if (
       order.deliveryType === "HUB_TO_USER" &&
       order.userDetails &&
-      (order.orderStatus === "Assigned for Delivery" ||
-        order.orderStatus === "Out for Delivery")
+      (order.orderStatus === "Delivery Agent Assigned" ||
+order.orderStatus === "Out For Delivery")
     ) {
       const address =
         order.userDetails.address;
@@ -303,29 +296,29 @@ const AgentOrders = () => {
 
     if (
       order.deliveryType === "SELLER_TO_HUB" &&
-      order.orderStatus === "Assigned"
+      order.orderStatus === "Pickup Assigned"
     ) {
       return (
         <div className="shrink-0">
-          <Dropdown
-            options={[
-              {
-                label: "Assigned",
-                value: "Assigned",
-              },
-              {
-                label: "Out for Pickup",
-                value: "Out for Pickup",
-              },
-            ]}
-            value={order.orderStatus}
-            onChange={(value) =>
-              handleStatusChange(
-                order.orderId,
-                value as OrderStatus
-              )
-            }
-          />
+         <Dropdown
+ options={[
+   {
+     label:"Pickup Assigned",
+     value:"Pickup Assigned",
+   },
+   {
+     label:"Out For Pickup",
+     value:"Out For Pickup",
+   }
+ ]}
+ value={order.orderStatus}
+ onChange={(value)=>
+   handleStatusChange(
+     order.orderId,
+     value as OrderStatus
+   )
+ }
+/>
         </div>
       );
     }
@@ -337,29 +330,29 @@ const AgentOrders = () => {
 
     if (
       order.deliveryType === "HUB_TO_USER" &&
-      order.orderStatus === "Assigned for Delivery"
+     order.orderStatus === "Delivery Agent Assigned"
     ) {
       return (
         <div className="shrink-0">
           <Dropdown
-            options={[
-              {
-                label: "Assigned for Delivery",
-                value: "Assigned for Delivery",
-              },
-              {
-                label: "Out for Delivery",
-                value: "Out for Delivery",
-              },
-            ]}
-            value={order.orderStatus}
-            onChange={(value) =>
-              handleStatusChange(
-                order.orderId,
-                value as OrderStatus
-              )
-            }
-          />
+ options={[
+  {
+    label:"Delivery Agent Assigned",
+    value:"Delivery Agent Assigned",
+  },
+  {
+    label:"Out For Delivery",
+    value:"Out For Delivery",
+  }
+ ]}
+ value={order.orderStatus}
+ onChange={(value)=>
+   handleStatusChange(
+     order.orderId,
+     value as OrderStatus
+   )
+ }
+/>
         </div>
       );
     }
@@ -438,20 +431,18 @@ const AgentOrders = () => {
               onClick={() =>
                 setActiveTab(tab.key)
               }
-              className={`relative flex shrink-0 items-center gap-1.5 px-4 py-3 text-sm font-medium transition ${
-                isActive
+              className={`relative flex shrink-0 items-center gap-1.5 px-4 py-3 text-sm font-medium transition ${isActive
                   ? "text-violet-700"
                   : "text-gray-500 hover:text-gray-700"
-              }`}
+                }`}
             >
               {tab.label}
 
               <span
-                className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${
-                  isActive
+                className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${isActive
                     ? "bg-violet-100 text-violet-700"
                     : "bg-gray-100 text-gray-500"
-                }`}
+                  }`}
               >
                 {count}
               </span>
@@ -476,7 +467,7 @@ const AgentOrders = () => {
         )}
 
         {filteredOrders.map((order) => {
-          const item = order.items[0];
+          const item = order.items?.[0] ?? null;
 
           return (
             <div
@@ -492,8 +483,8 @@ const AgentOrders = () => {
                 {/* BOOK IMAGE */}
 
                 <Rb_Image
-                  src={item.coverImage}
-                  alt={item.bookName}
+                  src={item?.coverImage || "/images/book-placeholder.png"}
+                  alt={item?.bookName || "Book"}
                   className="h-20 w-16 shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
                 />
 
@@ -512,13 +503,13 @@ const AgentOrders = () => {
                           .slice(-6)}
                       </Rb_Text>
 
-                      <Rb_Text className="mt-1 text-sm text-gray-800">
+                      {/* <Rb_Text className="mt-1 text-sm text-gray-800">
                         {item.bookName}
                       </Rb_Text>
 
                       <Rb_Text className="text-xs text-gray-500">
                         by {item.author}
-                      </Rb_Text>
+                      </Rb_Text> */}
                     </div>
 
                     {renderStatus(order)}
