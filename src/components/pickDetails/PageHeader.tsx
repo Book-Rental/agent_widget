@@ -32,11 +32,13 @@ const PageHeader = ({
         </Rb_Text>
       </div>
 
+<div  className="shrink-0">
       <StatusDropdown
         currentStatus={currentStatus}
         deliveryType={deliveryType}
         onChange={onStatusChange}
       />
+</div>
     </div>
   );
 };
