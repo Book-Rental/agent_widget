@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_Button, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useShipment } from "../hooks/useShipment";
+import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
 
 interface PickupVerificationProps {
@@ -11,7 +12,8 @@ const PickupVerification = ({
   shipmentId,
 }: PickupVerificationProps) => {
   const [photosComplete, setPhotosComplete] = useState(false);
-  const [conditionSelected , setConditionSelected ] = useState(false);
+  const [conditionSelected, setConditionSelected] = useState(false);
+
   const {
     data,
     isLoading,
@@ -22,7 +24,7 @@ const PickupVerification = ({
   const shipment = data?.data;
 
   if (isLoading) {
-    return <Rb_LoadingSpinner/>;
+    return <div>Loading shipment...</div>;
   }
 
   if (isError || !shipment) {
@@ -45,6 +47,7 @@ const PickupVerification = ({
     window.history.pushState(
       {},
       "",
+      //  `/agent-orders/${shipment.shipmentId}/confirmation`
       `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
     );
 
@@ -54,7 +57,7 @@ const PickupVerification = ({
   };
 
   return (
-    <div className="max-w-4xl space-y-6 p-6">
+    <div className="mx-auto max-w-4xl space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
           {isReturnPickup
@@ -137,13 +140,17 @@ const PickupVerification = ({
         }
       />
 
-      {/* <BookCondition /> */}
+      <BookCondition
+        onConditionChange={(condition) =>
+          setConditionSelected(condition !== null)
+        }
+      />
 
       <div className="flex justify-end pt-2">
         <Rb_Button
           variant="primary"
           onClick={handleProceed}
-          disabled={!photosComplete}
+          disabled={!photosComplete || !conditionSelected}
           className="min-w-[200px]"
         >
           Proceed with Pickup

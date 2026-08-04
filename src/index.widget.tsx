@@ -41,7 +41,7 @@ window.renderReactWidget = (config: string) => {
   const root = createRoot(container);
 
   root.render(
-        <App module={options.module} view={options.view} shipmentId={options.shipmentId}/>
+    <App module={options.module} view={options.view} shipmentId={options.shipmentId}/>
   );
 
   roots[options.containerElementId] = root;
