@@ -1,4 +1,4 @@
-import { AgentOrder } from "../Types/AgentTypes";
+import { AgentOrder, ShipmentApi } from "../Types/AgentTypes";
 
 const API_URL = import.meta.env.VITE_API_URL;
 export const getAgentOrders = async (
@@ -57,7 +57,7 @@ const statusMap: Record<
    "Cancelled",
 };
 
-  return result.data.shipments.map((shipment: any) => ({
+  return result.data.shipments.map((shipment:ShipmentApi ) => ({
     shipmentId: shipment._id,
     orderNumber: shipment.awbNumber,
 

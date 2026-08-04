@@ -149,3 +149,40 @@ export type JourneyHistory = {
   eventAt: string;
   remarks?: string;
 };
+
+export type ShipmentApi = {
+  _id: string;
+  awbNumber: string;
+  currentStatus: string;
+  createdAt: string;
+
+  sellerId: string;
+
+  sender: {
+    name: string;
+    phone: string;
+    addressLine1: string;
+    city: string;
+    state: string;
+    pincode: string;
+    country: string;
+  };
+
+  orderDetails: {
+    orderItem: {
+      bookId: string;
+      bookName: string;
+      author: string;
+      coverImage: string;
+      quantity: number;
+    };
+  };
+
+  originHubId: {
+    _id: string;
+    hubName: string;
+    hubCode: string;
+  };
+
+  journeyHistory: JourneyHistory[];
+};

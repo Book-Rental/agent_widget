@@ -4,9 +4,10 @@ import {
 } from "@rentbook/rentbook-ui-lib";
 
 import { FiBookOpen } from "react-icons/fi";
+import { OrderItem } from "../../Types/AgentTypes";
 
 type Props = {
-  item: any;
+  item: OrderItem;
 };
 
 const BookDetails = ({ item }: Props) => {
