@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Rb_Button, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useShipment } from "../hooks/useShipment";
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
@@ -24,7 +24,7 @@ const PickupVerification = ({
   const shipment = data?.data;
 
   if (isLoading) {
-    return <div>Loading shipment...</div>;
+    return <Rb_LoadingSpinner/>;
   }
 
   if (isError || !shipment) {
