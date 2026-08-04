@@ -1,10 +1,12 @@
 import { Rb_Button, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { useShipment } from "../hooks/useShipment";
 
 interface PickupSuccessProps {
-  orderId: string;
-  bookName: string;
-  pickedUpFrom: string;
-  dateTime: string;
+  // orderId: string;
+  // bookName: string;
+  // pickedUpFrom: string;
+  // dateTime: string;
+  shipmentId: string;
   onViewOrderDetails: () => void;
   onBackToOrders: () => void;
 }
@@ -27,13 +29,20 @@ const CONFETTI = [
 ] as const;
 
 const PickupSuccess = ({
-  orderId,
-  bookName,
-  pickedUpFrom,
-  dateTime,
+  shipmentId,
   onViewOrderDetails,
   onBackToOrders,
 }: PickupSuccessProps) => {
+  const { data, isLoading, isError, } = useShipment(shipmentId);
+  const shipment = data?.data;
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError || !shipment) {
+    return <div>Unable to load shipment.</div>;
+  }
   return (
     <div className="mx-auto max-w-xl rounded-2xl bg-white p-8 shadow-lg">
       {/* Scoped keyframes for effects that plain Tailwind utilities can't express */}
@@ -141,23 +150,23 @@ const PickupSuccess = ({
         <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
           <Rb_Text className="text-gray-500">Order ID</Rb_Text>
           <Rb_Text className="text-right text-gray-900">
-            {orderId}
+            {shipment.orderId}
           </Rb_Text>
         </div>
 
-        <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
+        {/* <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
           <Rb_Text className="text-gray-500">Book</Rb_Text>
           <Rb_Text className="text-right text-gray-900">
             {bookName}
           </Rb_Text>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
           <Rb_Text className="text-gray-500">
             Picked Up From
           </Rb_Text>
           <Rb_Text className="text-right text-gray-900">
-            {pickedUpFrom}
+            {`${shipment.sender.addressLine1}, ${shipment.sender.city}`}
           </Rb_Text>
         </div>
 
@@ -166,7 +175,7 @@ const PickupSuccess = ({
             Date & Time
           </Rb_Text>
           <Rb_Text className="text-right text-gray-900">
-            {dateTime}
+            {new Date(shipment.updatedAt).toLocaleString()}
           </Rb_Text>
         </div>
       </div>

@@ -17,7 +17,7 @@ const PageHeader = ({
   orderNumber,
   currentStatus,
   deliveryType,
-  order,
+  // order,
   onStatusChange,
 }: Props) => {
   return (

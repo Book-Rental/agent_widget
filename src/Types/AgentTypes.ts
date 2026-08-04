@@ -140,6 +140,7 @@ export type AgentOrder = {
 
   deliveryVerification?: DeliveryVerification;
   journeyHistory: JourneyHistory[];
+  shipmentId?: string
 };
 
 export type JourneyHistory = {

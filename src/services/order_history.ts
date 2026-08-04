@@ -9,7 +9,9 @@ export const getAgentOrders = async (
   );
 
   const result = await response.json();
-
+console.log("API Response", result);
+console.log("result.data", result.data);
+console.log("result.data.shipments", result?.data?.shipments);
 const statusMap: Record<
  string,
  AgentOrder["orderStatus"]
@@ -56,7 +58,7 @@ const statusMap: Record<
 };
 
   return result.data.shipments.map((shipment: any) => ({
-    orderId: shipment._id,
+    shipmentId: shipment._id,
     orderNumber: shipment.awbNumber,
 
     orderStatus:
