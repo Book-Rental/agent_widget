@@ -1,24 +1,54 @@
-import { Rb_Button } from "@rentbook/rentbook-ui-lib";
-import { PickupDetails } from "../Types/pickup";
 import { useState } from "react";
+import { Rb_Button, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { useShipment } from "../hooks/useShipment";
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
-import PickupBookInfo from "../components/sellerPickup/PickupBookInfo";
-import ReferencePhotosSection from "../components/sellerPickup/ReferencePhotosSection";
 
 interface PickupVerificationProps {
-  pickup: PickupDetails;
+  shipmentId: string;
 }
 
-const PickupVerification = ({ pickup }: PickupVerificationProps) => {
-  const isReturnPickup = pickup.pickupType === "RETURN_PICKUP";
+const PickupVerification = ({
+  shipmentId,
+}: PickupVerificationProps) => {
   const [photosComplete, setPhotosComplete] = useState(false);
+  const [conditionSelected, setConditionSelected] = useState(false);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useShipment(shipmentId);
+
+  const shipment = data?.data;
+
+  if (isLoading) {
+    return <div>Loading shipment...</div>;
+  }
+
+  if (isError || !shipment) {
+    return (
+      <div>
+        Error loading shipment.
+        {error instanceof Error && (
+          <p>{error.message}</p>
+        )}
+      </div>
+    );
+  }
+
+  const isReturnPickup =
+    shipment.shipmentType === "Return";
+
   const handleProceed = () => {
-    console.log("Proceed with Pickup", pickup.pickupType);
-     window.history.pushState(
+    console.log("Shipment:", shipment);
+
+    window.history.pushState(
       {},
       "",
-      `/confirmation-page`
+      //  `/agent-orders/${shipment.shipmentId}/confirmation`
+      `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
     );
 
     window.dispatchEvent(
@@ -36,26 +66,91 @@ const PickupVerification = ({ pickup }: PickupVerificationProps) => {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500">
-          Verify the book details, capture the required photos, and record the
-          book condition before proceeding.
+          Verify the shipment before proceeding.
         </p>
       </div>
 
-      <PickupBookInfo pickup={pickup} />
+      {/* Shipment Information */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <Rb_Text className="text-lg font-semibold">
+          Shipment Details
+        </Rb_Text>
 
-      {isReturnPickup && pickup.referencePhotos && (
-        <ReferencePhotosSection
-          referencePhotos={pickup.referencePhotos}
-        />
-      )}
+        <div className="mt-4 space-y-3">
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              Shipment ID
+            </Rb_Text>
+            <Rb_Text>{shipment.shipmentId}</Rb_Text>
+          </div>
 
-      <BookPhotoUpload onChange={(data) => setPhotosComplete(data.isComplete)} />
-      <BookCondition />
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              Order ID
+            </Rb_Text>
+            <Rb_Text>{shipment.orderId}</Rb_Text>
+          </div>
+
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              AWB Number
+            </Rb_Text>
+            <Rb_Text>{shipment.awbNumber}</Rb_Text>
+          </div>
+
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              Current Status
+            </Rb_Text>
+            <Rb_Text>{shipment.currentStatus}</Rb_Text>
+          </div>
+
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              Assigned Agent
+            </Rb_Text>
+            <Rb_Text>{shipment.assignedAgent.fullName}</Rb_Text>
+          </div>
+
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              Sender
+            </Rb_Text>
+            <Rb_Text>{shipment.sender.name}</Rb_Text>
+          </div>
+
+          <div>
+            <Rb_Text className="text-xs text-gray-500">
+              Receiver
+            </Rb_Text>
+            <Rb_Text>{shipment.receiver.name}</Rb_Text>
+          </div>
+        </div>
+      </div>
+
+      {/* Waiting for Order API */}
+      {/* <PickupBookInfo /> */}
+
+      {/* Waiting for Reference Photos API */}
+      {/* <ReferencePhotosSection /> */}
+
+      <BookPhotoUpload
+        onChange={(data) =>
+          setPhotosComplete(data.isComplete)
+        }
+      />
+
+      <BookCondition
+        onConditionChange={(condition) =>
+          setConditionSelected(condition !== null)
+        }
+      />
+
       <div className="flex justify-end pt-2">
         <Rb_Button
           variant="primary"
           onClick={handleProceed}
-          disabled={!photosComplete}
+          disabled={!photosComplete || !conditionSelected}
           className="min-w-[200px]"
         >
           Proceed with Pickup

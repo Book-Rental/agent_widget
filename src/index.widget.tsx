@@ -4,6 +4,9 @@ import "./index.css";
 
 export interface AgentWidgetOptions {
   containerElementId: string;
+  module: "pickup" | "delivery";
+  view: | "orders" | "details" | "verification" | "confirmation";
+  shipmentId?: string; 
 }
 
 declare global {
@@ -38,7 +41,7 @@ window.renderReactWidget = (config: string) => {
   const root = createRoot(container);
 
   root.render(
-        <App />
+    <App module={options.module} view={options.view} shipmentId={options.shipmentId}/>
   );
 
   roots[options.containerElementId] = root;

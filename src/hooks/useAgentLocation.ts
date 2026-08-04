@@ -14,7 +14,7 @@ export const useAgentLocation = (
     useState(true);
 
     // existing useEffect
-
+  console.log (coordinates ,setDistance,setEta,setLoading )
   return {
     distance,
     eta,

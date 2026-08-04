@@ -1,4 +1,4 @@
-import type { AgentOrder } from "../Types/AgentTypes";
+import type { AgentOrder, JourneyHistory } from "../Types/AgentTypes";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -88,14 +88,12 @@ return {
     },
   ],
 
-    journeyHistory:
-    shipment.journeyHistory.map((item:any)=>({
-      event:item.event,
-      status:item.status,
-      eventAt:item.eventAt,
-      remarks:item.remarks
-    })),
-
+    journeyHistory: shipment.journeyHistory.map((item: JourneyHistory) => ({
+  event: item.event,
+  status: item.status,
+  eventAt: item.eventAt,
+  remarks: item.remarks,
+})),
 
   sellerDetails: {
     sellerId: shipment.sellerId,

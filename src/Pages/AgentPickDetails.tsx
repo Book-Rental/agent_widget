@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 
 import type { OrderStatus } from "../Types/AgentTypes";
 
 import { useAgentOrderDetails } from "../hooks/useAgentOrderDetails";
-import { useAgentLocation } from "../hooks/useAgentLocation";
+// import { useAgentLocation } from "../hooks/useAgentLocation";
 
 import { callPhone } from "../utils/phone";
 import { openMaps } from "../utils/openMaps";
@@ -17,11 +17,11 @@ import ActionCard from "../components/pickDetails/ActionCard";
 import { LocationCard } from "../components/pickDetails/LocationCard";
 
 type AgentPickDetailsProps = {
-  orderId?: string;
+   shipmentId: string;
 };
 
-const AgentPickDetails = ({orderId}: AgentPickDetailsProps) => {
-  const shipmentId = window.location.pathname.split("/").pop() ?? "";
+const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
+  // const shipmentId = window.location.pathname.split("/").pop() ?? "";
 
   const { data: order, isLoading, isError } =
     useAgentOrderDetails(shipmentId);
@@ -45,15 +45,15 @@ const AgentPickDetails = ({orderId}: AgentPickDetailsProps) => {
   const user = order?.userDetails;
   const hub = order?.hubDetails;
 
-  const address = useMemo(() => {
-    if (isSellerToHub) return seller?.address;
-    if (isHubToUser) return user?.address;
-    return undefined;
-  }, [isSellerToHub, isHubToUser, seller, user]);
+  // const address = useMemo(() => {
+  //   if (isSellerToHub) return seller?.address;
+  //   if (isHubToUser) return user?.address;
+  //   return undefined;
+  // }, [isSellerToHub, isHubToUser, seller, user]);
 
-  const coordinates = address?.location?.coordinates;
+  // const coordinates = address?.location?.coordinates;
 
-const { distance } = useAgentLocation(coordinates);
+// const { distance } = useAgentLocation(coordinates);
 
   const timeline = useMemo(() => {
     if (!order) return [];
@@ -76,11 +76,12 @@ const { distance } = useAgentLocation(coordinates);
 
   const goToVerification = () => {
     if (!order) return;
-
+    console.log(order);
     window.history.pushState(
       {},
       "",
-      `/agent-orders/${order.orderId}/pickup-verification`
+      // `/agent-orders/${order.shipmentId}/pickup-verification`
+      `/agent/pickup-orders/${shipmentId}/pickup-verification`
     );
 
     window.dispatchEvent(
@@ -90,9 +91,7 @@ const { distance } = useAgentLocation(coordinates);
 
   if (isLoading) {
     return (
-      <div className="p-10">
-        <Rb_Text>Loading...</Rb_Text>
-      </div>
+        <Rb_LoadingSpinner />
     );
   }
 

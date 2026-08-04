@@ -1,4 +1,4 @@
-import { AgentOrder } from "../Types/AgentTypes";
+import { AgentOrder, ShipmentApi } from "../Types/AgentTypes";
 
 const API_URL = import.meta.env.VITE_API_URL;
 export const getAgentOrders = async (
@@ -9,7 +9,9 @@ export const getAgentOrders = async (
   );
 
   const result = await response.json();
-
+console.log("API Response", result);
+console.log("result.data", result.data);
+console.log("result.data.shipments", result?.data?.shipments);
 const statusMap: Record<
  string,
  AgentOrder["orderStatus"]
@@ -55,8 +57,8 @@ const statusMap: Record<
    "Cancelled",
 };
 
-  return result.data.shipments.map((shipment: any) => ({
-    orderId: shipment._id,
+  return result.data.shipments.map((shipment:ShipmentApi ) => ({
+    shipmentId: shipment._id,
     orderNumber: shipment.awbNumber,
 
     orderStatus:

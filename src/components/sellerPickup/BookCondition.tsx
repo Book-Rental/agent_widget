@@ -7,6 +7,12 @@ type BookConditionType =
   | "MODERATE_DAMAGE"
   | "SEVERE_DAMAGE";
 
+interface BookConditionProps {
+  onConditionChange: (
+    condition: BookConditionType | null
+  ) => void;
+}
+
 const conditions = [
   {
     label: "Good",
@@ -28,7 +34,7 @@ const conditions = [
 
 const MAX_REMARK_LENGTH = 500;
 
-const BookCondition = () => {
+const BookCondition = ({ onConditionChange }: BookConditionProps) => {
   const [selectedCondition, setSelectedCondition] =
     useState<BookConditionType | null>(null);
 
@@ -61,9 +67,10 @@ const BookCondition = () => {
                   name="bookCondition"
                   value={condition.value}
                   checked={selectedCondition === condition.value}
-                  onChange={() =>
-                    setSelectedCondition(condition.value)
-                  }
+                  onChange={() => {
+                    setSelectedCondition(condition.value);
+                    onConditionChange(condition.value);
+                  }}
                   label={condition.label}
                 />
               </div>
