@@ -72,21 +72,15 @@ export type HubDetails = {
   address: string;
   city: string;
   state: string;
-
   distance?: string;
-
   location?: Location;
-
   receivedBy?: {
     adminId: string;
     name: string;
     phoneNumber?: string;
   };
-
   receivedDate?: string;
-
   receivedImages?: string[];
-
   verificationStatus?: string;
 };
 
@@ -108,36 +102,23 @@ export type AgentOrder = {
   orderId: string;
   orderNumber: string;
   orderDate: string;
-
    shipmentType: ShipmentType;
-
   // Frontend agent flow
   deliveryType: DeliveryType;
-
   assignedDate?: string;
   pickupStartedDate?: string;
   pickupDate?: string;
-
   hubStartedDate?: string;
   hubSubmittedDate?: string;
-
   completedDate?: string;
-
   deliveryStartedDate?: string;
   deliveredDate?: string;
-
   orderStatus: OrderStatus;
-
   items: OrderItem[];
-
   sellerDetails?: SellerDetails;
-
   hubDetails?: HubDetails;
-
   userDetails?: UserDetails;
-
   pickupVerification?: PickupVerification;
-
   deliveryVerification?: DeliveryVerification;
   journeyHistory: JourneyHistory[];
   shipmentId?: string
@@ -185,4 +166,12 @@ export type ShipmentApi = {
   };
 
   journeyHistory: JourneyHistory[];
+};
+
+export type UpdateShipmentStatusPayload = {
+  status: OrderStatus;
+  event: string;
+  agentId: string;
+  remarks: string;
+  updatedBy: string;
 };

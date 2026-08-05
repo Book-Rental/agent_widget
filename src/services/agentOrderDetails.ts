@@ -61,11 +61,13 @@ export const getAgentOrderDetails = async (
   };
 
 return {
-  orderId: shipment.shipmentId,
-  orderNumber: shipment.orderItemId,
 
-  orderDate: shipment.createdAt,   // ✅ add
-  shipmentType: shipment.shipmentType ?? "Standard", // ✅ add
+   shipmentId: shipment.shipmentId,                 
+    orderId: shipment.orderId,               
+    orderNumber: shipment.awbNumber ?? shipment.orderId, 
+
+  orderDate: shipment.createdAt,  
+  shipmentType: shipment.shipmentType ?? "Standard", 
 
   orderStatus:
     statusMap[shipment.currentStatus] ?? "Assigned",

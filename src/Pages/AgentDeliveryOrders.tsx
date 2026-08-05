@@ -1,13 +1,11 @@
 import { useMemo } from "react";
-import {
-  Dropdown,
-  Rb_Button,
-  Rb_Image,
-  Rb_Text,
-} from "@rentbook/rentbook-ui-lib";
+import { Dropdown, Rb_Button, Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
 
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import type { OrderStatus } from "../Types/AgentTypes";
+import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
+import { STATUS_CONFIG } from "../constants/shipmentStatus";
+import type { AgentOrder } from "../Types/AgentTypes";
 // import { AgentOrderDetailsMock } from "../mock/AgentOrderDetails";
 
 const DELIVERY_STATUSES: OrderStatus[] = [
@@ -19,21 +17,35 @@ const DELIVERY_STATUSES: OrderStatus[] = [
 
 const AgentDeliveryOrders = () => {
   const agentId = "6a6b10202eb459f877594bb0";
+  const { mutate: updateShipmentStatus } = useUpdateShipmentStatus();
+  const { data: orders = [], isPending, isError, } = useAgentOrders(agentId);
+  // const orders: AgentOrder[] = AgentOrderDetailsMock;
 
-  const {
-    data: orders = [],
-    isPending,
-    isError,
-  } = useAgentOrders(agentId);
-// const orders: AgentOrder[] = AgentOrderDetailsMock;
-
-// const isPending = false;
-// const isError = false;
+  // const isPending = false;
+  // const isError = false;
   const deliveryOrders = useMemo(() => {
     return orders.filter((order) =>
       DELIVERY_STATUSES.includes(order.orderStatus)
     );
   }, [orders]);
+
+  const handleStatusChange = (
+    order: AgentOrder,
+    status: OrderStatus
+  ) => {
+    if (!order.shipmentId) return;
+
+    updateShipmentStatus({
+      shipmentId: order.shipmentId,
+      payload: {
+        status,
+        event: STATUS_CONFIG[status]!.event,
+        remarks: STATUS_CONFIG[status]!.remarks,
+        agentId,
+        updatedBy: agentId,
+      },
+    });
+  };
 
   if (isPending) return <div>Loading...</div>;
   if (isError) return <div>Something went wrong</div>;
@@ -107,7 +119,10 @@ const AgentDeliveryOrders = () => {
                           ]}
                           value={order.orderStatus}
                           onChange={(value) =>
-                            console.log(order.orderId, value)
+                            handleStatusChange(
+                              order,
+                              value as OrderStatus
+                            )
                           }
                         />
                         </div>
@@ -159,12 +174,12 @@ const AgentDeliveryOrders = () => {
                   <Rb_Text className="text-xs text-gray-400">
                     Assigned{" "}
                     {order.assignedDate
-  ? new Date(order.assignedDate).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    })
-  : "—"}
+                    ? new Date(order.assignedDate).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "—"}
                   </Rb_Text>
 
                   <Rb_Button
