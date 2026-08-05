@@ -1,12 +1,15 @@
-// utils/openMaps.ts
-
 export const openMaps = (
   location?: {
     type: string;
     coordinates: number[];
   }
 ) => {
-  if (!location?.coordinates) return;
+  if (
+    !location?.coordinates ||
+    location.coordinates.length !== 2
+  ) {
+    return;
+  }
 
   const [longitude, latitude] = location.coordinates;
 
@@ -15,5 +18,5 @@ export const openMaps = (
     `&destination=${latitude},${longitude}` +
     `&travelmode=driving`;
 
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.open(url, "_blank");
 };

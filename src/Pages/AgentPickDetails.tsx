@@ -31,28 +31,63 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
 
   const isSellerToHub = order?.deliveryType === "SELLER_TO_HUB";
   const isHubToUser = order?.deliveryType === "HUB_TO_USER";
-  const seller = order?.sellerDetails;
-  const user = order?.userDetails;
-  const hub = order?.hubDetails;
+const seller = order?.sellerDetails;
+const user = order?.userDetails;
+const hub = order?.hubDetails;
 
-  // const address = useMemo(() => {
-  //   if (isSellerToHub) return seller?.address;
-  //   if (isHubToUser) return user?.address;
-  //   return undefined;
-  // }, [isSellerToHub, isHubToUser, seller, user]);
+const showSellerDetails =
+  isSellerToHub &&
+  [
+    "Pickup Assigned",
+    "Out For Pickup",
+   
+  ].includes(currentStatus);
 
-  // const coordinates = address?.location?.coordinates;
+const showHubDetails =
+  isSellerToHub &&
+  [
+     "Pickup Completed",
+    "Arrived At Origin Hub",
+    "Submitted to Admin",
+    "Sorting Completed",
+  ].includes(currentStatus);
+ const timeline = useMemo(() => {
+  if (!order) return [];
 
-// const { distance } = useAgentLocation(coordinates);
+  const sellerTimeline: OrderStatus[] = [
+    "Pickup Assigned",
+    "Out For Pickup",
+    "Pickup Completed",
+    "Arrived At Origin Hub",
+  ];
 
-  const timeline = useMemo(() => {
-    if (!order) return [];
-    return order.journeyHistory.map((item) => ({
-      label: item.status,
-      date: item.eventAt,
-      description: item.remarks,
-    }));
-  }, [order]);
+  const deliveryTimeline: OrderStatus[] = [
+    "Delivery Agent Assigned",
+    "Out For Delivery",
+    "Delivered",
+  ];
+
+  const statuses =
+    order.deliveryType === "SELLER_TO_HUB"
+      ? sellerTimeline
+      : deliveryTimeline;
+
+return statuses.map((status) => {
+  const history = order.journeyHistory.find(
+    (item) => item.status === status
+  );
+
+  return {
+    label:
+      status === "Arrived At Origin Hub"
+        ? "Completed"
+        : status,
+    date: history?.eventAt,
+    description: history?.remarks,
+  };
+});
+}, [order]);
+
   const { mutate: updateStatus } = useUpdateShipmentStatus();
   const agentId = "6a6b10202eb459f877594bb0";
   const handleStatusChange = (value: string) => {
@@ -144,34 +179,33 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
 
         <BookDetails item={order.items[0]} />
 
-        {(seller || user) && (
-          <ContactCard
-            title={
-              isSellerToHub
-                ? "Pickup Contact"
-                : "Delivery Contact"
-            }
-            name={
-              isSellerToHub
-                ? seller?.name ?? ""
-                : user?.name ?? ""
-            }
-            phone={
-              isSellerToHub
-                ? seller?.phoneNumber
-                : user?.phoneNumber
-            }
-            onCall={() =>
-              callPhone(
-                isSellerToHub
-                  ? seller?.phoneNumber
-                  : user?.phoneNumber
-              )
-            }
-          />
-        )}
+{showSellerDetails && seller && (
+  <ContactCard
+    title="Pickup Contact"
+    name={seller.name}
+    phone={seller.phoneNumber}
+    onCall={() => callPhone(seller.phoneNumber)}
+  />
+)}
 
-        {isSellerToHub && seller?.address && (
+{showHubDetails && hub && (
+  <ContactCard
+    title="Hub Contact"
+    name={hub.name}
+    onCall={() => {}}
+  />
+)}
+
+{isHubToUser && user && (
+  <ContactCard
+    title="Delivery Contact"
+    name={user.name}
+    phone={user.phoneNumber}
+    onCall={() => callPhone(user.phoneNumber)}
+  />
+)}
+
+      {showSellerDetails && seller?.address && (
   <LocationCard
     title="Pickup Location"
     subtitle="Seller pickup address"
@@ -183,14 +217,14 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
   />
 )}
 
-{isSellerToHub && hub && currentStatus === "Pickup Completed" && (
+{showHubDetails && hub && (
   <LocationCard
     title="Hub Details"
     subtitle="Submit book to hub"
     name={hub.name}
     address={hub.address}
     city={`${hub.city}, ${hub.state}`}
-    onMap={() => openMaps(hub.location)}
+    onMap={() => {}}
   />
 )}
 

@@ -111,15 +111,24 @@ return {
       zipCode: shipment.sender.pincode,
       country: shipment.sender.country,
       phone: shipment.sender.phone,
+      location: shipment.sender.location
     },
   },
 
-  hubDetails: {
-    hubId: shipment.infrastructure.originHub._id,
-    name: shipment.infrastructure.originHub.hubName,
-    address: shipment.infrastructure.originHub.address.street,
-    city: shipment.infrastructure.originHub.address.city,
-    state: shipment.infrastructure.originHub.address.state,
+ hubDetails: {
+  hubId: shipment.infrastructure.originHub._id,
+  name: shipment.infrastructure.originHub.hubName,
+  address: shipment.infrastructure.originHub.address.street,
+  city: shipment.infrastructure.originHub.address.city,
+  state: shipment.infrastructure.originHub.address.state,
+pincode: shipment.infrastructure.originHub.address.pincode,
+  location: {
+    type: "Point",
+    coordinates: [
+      78.42257541892057,
+      17.425455479571756,
+    ],
   },
+},
 };
 };

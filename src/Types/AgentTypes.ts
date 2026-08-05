@@ -82,6 +82,7 @@ export type HubDetails = {
   receivedDate?: string;
   receivedImages?: string[];
   verificationStatus?: string;
+  pincode: string
 };
 
 export type PickupVerification = {

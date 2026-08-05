@@ -1,6 +1,6 @@
 import { Dropdown } from "@rentbook/rentbook-ui-lib";
 import type { OrderStatus } from "../../Types/AgentTypes";
-import { STATUS_META } from "../../utils/statusMeta";
+import { STATUS_META } from "../orderDetails/Agentorderstatusdisplay";
 
 type Props = {
   currentStatus: OrderStatus;
