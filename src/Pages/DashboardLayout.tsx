@@ -23,7 +23,15 @@ const DashboardLayout = ({
         onClose={() => setMobileOpen(false)}
       />
 
-      <main className="flex-1">
+      <main
+        className={`
+          flex-1
+          transition-all
+          duration-300
+          ${mobileOpen ? "pointer-events-none" : ""}
+          md:pointer-events-auto
+        `}
+      >
 
         {/* Mobile Menu Button */}
         <button
@@ -34,7 +42,17 @@ const DashboardLayout = ({
         </button>
 
 
-        <div className="p-5">
+        <div
+          className={`
+            px-5
+            pb-5
+            pt-6
+            md:pt-5
+            transition-opacity
+            duration-300
+            ${mobileOpen ? "opacity-60" : "opacity-100"}
+          `}
+        >
           {children}
         </div>
 

@@ -76,37 +76,44 @@ const AgentDeliveryOrders = () => {
         </p>
       </div>
 
-      <AgentOrderTabs
-        tabs={TABS}
-        activeTab={activeTab}
-        counts={counts}
-        onChange={setActiveTab}
-      />
-
-      <div className="space-y-3">
-        {filteredOrders.length === 0 && (
-          <EmptyOrdersState
-            message={EMPTY_STATE_COPY[activeTab] ?? "No orders in this category yet."}
+      {deliveryOrders.length > 0 && (
+          <AgentOrderTabs
+            tabs={TABS}
+            activeTab={activeTab}
+            counts={counts}
+            onChange={setActiveTab}
           />
         )}
 
-        {filteredOrders.map((order) => (
-          <AgentOrderCard
-            key={order.orderId}
-            order={order}
-            statusSlot={
-              <OrderStatusControl
+        <div className="space-y-3">
+          {filteredOrders.length === 0 ? (
+            <EmptyOrdersState
+              message={
+                EMPTY_STATE_COPY[activeTab] ??
+                "No orders in this category yet."
+              }
+            />
+          ) : (
+            filteredOrders.map((order) => (
+              <AgentOrderCard
+                key={order.orderId}
                 order={order}
-                statusMeta={STATUS_META}
-                dropdownConfigs={DROPDOWN_CONFIGS}
-                onStatusChange={changeStatus}
+                statusSlot={
+                  <OrderStatusControl
+                    order={order}
+                    statusMeta={STATUS_META}
+                    dropdownConfigs={DROPDOWN_CONFIGS}
+                    onStatusChange={changeStatus}
+                  />
+                }
+                locationSlot={<AgentOrderLocation order={order} />}
+                onViewDetails={(o) =>
+                  navigateTo(`/agent-orders/${o.shipmentId}`)
+                }
               />
-            }
-            locationSlot={<AgentOrderLocation order={order} />}
-            onViewDetails={(o) => navigateTo(`/agent-orders/${o.shipmentId}`)}
-          />
-        ))}
-      </div>
+            ))
+          )}
+        </div>
     </div>
   );
 };
