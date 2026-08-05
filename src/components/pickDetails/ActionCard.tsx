@@ -16,7 +16,6 @@ type Props = {
 const ActionCard = ({
   status,
   onVerify,
-  onSorting,
   onDelivered,
 }: Props) => {
   if (status === "Out For Pickup") {
@@ -34,19 +33,19 @@ const ActionCard = ({
     );
   }
 
-  if (status === "Pickup Completed") {
-    return (
-      <div className="mt-4 rounded-2xl bg-indigo-50 p-4 flex justify-between">
-        <Rb_Text>
-          Submit book to hub
-        </Rb_Text>
+  // if (status === "Pickup Completed") {
+  //   return (
+  //     <div className="mt-4 rounded-2xl bg-indigo-50 p-4 flex justify-between">
+  //       <Rb_Text>
+  //         Submit book to hub
+  //       </Rb_Text>
 
-        <Rb_Button onClick={onSorting}>
-          Complete Sorting
-        </Rb_Button>
-      </div>
-    );
-  }
+  //       <Rb_Button onClick={onSorting}>
+  //         Complete Sorting
+  //       </Rb_Button>
+  //     </div>
+  //   );
+  // }
 
   if (status === "Out For Delivery") {
     return (

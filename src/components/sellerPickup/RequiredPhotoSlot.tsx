@@ -39,19 +39,19 @@ const RequiredPhotoSlot = ({
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
-      <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-green-500 px-2 py-0.5 text-xs text-white">
-        <FiCheck size={12} />
-        {label}
-      </div>
+ <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-2 shadow-sm z-0">
+  <div className="absolute left-2 top-2 z-0 flex items-center gap-1 rounded-full bg-green-500 px-2 py-0.5 text-xs text-white">
+    <FiCheck size={12} />
+    {label}
+  </div>
 
-      <button
-        type="button"
-        onClick={() => onRemove(slotKey)}
-        className="absolute right-2 top-2 z-10 rounded-full bg-red-500 p-1 text-white opacity-0 transition group-hover:opacity-100"
-      >
-        <FiTrash2 size={14} />
-      </button>
+  <button
+    type="button"
+    onClick={() => onRemove(slotKey)}
+    className="absolute right-2 top-2 z-0 rounded-full bg-red-500 p-1 text-white opacity-0 transition group-hover:opacity-100"
+  >
+    <FiTrash2 size={14} />
+  </button>
 
       <Rb_Image
         src={URL.createObjectURL(file)}
