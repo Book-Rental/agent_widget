@@ -57,8 +57,8 @@ const Sidebar = ({
 
       <aside
         className={`
-          sticky top-16
-          h-[calc(100vh-4rem)]
+          fixed left-0 top-0 z-0
+          h-screen w-[240px]
           border-r border-slate-200 bg-white
           pt-6
           transition-transform duration-300

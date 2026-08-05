@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { Dropdown, Rb_Button, Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
-
+import { Dropdown, Rb_Button, Rb_Image, Rb_Text, Rb_LoadingSpinner, } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import type { OrderStatus } from "../Types/AgentTypes";
 import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
@@ -47,8 +46,16 @@ const AgentDeliveryOrders = () => {
     });
   };
 
-  if (isPending) return <div>Loading...</div>;
-  if (isError) return <div>Something went wrong</div>;
+  if (isPending) {
+    return <Rb_LoadingSpinner />;
+  }
+  if (isError) {
+    return (
+      <div className="p-10">
+        <Rb_Text>Something went wrong</Rb_Text>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl px-4 py-6">
