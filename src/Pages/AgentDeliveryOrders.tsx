@@ -1,54 +1,64 @@
-import { useMemo } from "react";
-import { Dropdown, Rb_Button, Rb_Image, Rb_Text, Rb_LoadingSpinner, } from "@rentbook/rentbook-ui-lib";
+import { useMemo, useState } from "react";
+import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
-import type { OrderStatus } from "../Types/AgentTypes";
-import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
-import { STATUS_CONFIG } from "../constants/shipmentStatus";
-import type { AgentOrder } from "../Types/AgentTypes";
-// import { AgentOrderDetailsMock } from "../mock/AgentOrderDetails";
+import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
+import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
+import { OrderStatusControl } from "../components/orderDetails/Orderstatuscontrol";
+import { DROPDOWN_CONFIGS, STATUS_META } from "../components/orderDetails/Agentorderstatusdisplay";
+import { AgentOrderLocation } from "../components/orderDetails/Agentorderlocation";
+import { EmptyOrdersState } from "../components/orderDetails/EmptyState";
+import { AgentOrderTabs } from "../components/orderDetails/Agentordertabs";
 
-const DELIVERY_STATUSES: OrderStatus[] = [
-  "Delivery Agent Assigned",
-  "Out For Delivery",
-  "Delivered",
-];
+const TABS = [
+  { key: "all", label: "All Orders" },
+  { key: "Delivery Agent Assigned", label: "Delivery Assigned" },
+  { key: "Out For Delivery", label: "Out For Delivery" },
+  { key: "Delivered", label: "Delivered" },
+] as const;
 
+const EMPTY_STATE_COPY: Partial<Record<(typeof TABS)[number]["key"], string>> = {
+  all: "You don't have any delivery orders right now. New assignments will show up here.",
+  "Delivery Agent Assigned": "No deliveries have been assigned to you yet.",
+  "Out For Delivery": "Nothing is currently out for delivery.",
+  Delivered: "You haven't delivered any orders yet.",
+};
+
+const navigateTo = (path: string) => {
+  window.history.pushState({}, "", path);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+};
 
 const AgentDeliveryOrders = () => {
   const agentId = "6a6b10202eb459f877594bb0";
-  const { mutate: updateShipmentStatus } = useUpdateShipmentStatus();
-  const { data: orders = [], isPending, isError, } = useAgentOrders(agentId);
-  // const orders: AgentOrder[] = AgentOrderDetailsMock;
+  const changeStatus = useAgentStatusChange(agentId);
+  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
+  const { data: orders = [], isPending, isError } = useAgentOrders(agentId);
 
-  // const isPending = false;
-  // const isError = false;
-  const deliveryOrders = useMemo(() => {
-    return orders.filter((order) =>
-      DELIVERY_STATUSES.includes(order.orderStatus)
-    );
-  }, [orders]);
+  const deliveryOrders = useMemo(
+    () =>
+      orders.filter((order) =>
+        TABS.slice(1).some((tab) => tab.key === order.orderStatus)
+      ),
+    [orders]
+  );
 
-  const handleStatusChange = (
-    order: AgentOrder,
-    status: OrderStatus
-  ) => {
-    if (!order.shipmentId) return;
-
-    updateShipmentStatus({
-      shipmentId: order.shipmentId,
-      payload: {
-        status,
-        event: STATUS_CONFIG[status]!.event,
-        remarks: STATUS_CONFIG[status]!.remarks,
-        agentId,
-        updatedBy: agentId,
-      },
+  const counts = useMemo(() => {
+    const result: Record<string, number> = { all: deliveryOrders.length };
+    deliveryOrders.forEach((order) => {
+      result[order.orderStatus] = (result[order.orderStatus] || 0) + 1;
     });
-  };
+    return result;
+  }, [deliveryOrders]);
+
+  const filteredOrders = useMemo(() => {
+    if (activeTab === "all") return deliveryOrders;
+    return deliveryOrders.filter((order) => order.orderStatus === activeTab);
+  }, [activeTab, deliveryOrders]);
 
   if (isPending) {
     return <Rb_LoadingSpinner />;
   }
+
   if (isError) {
     return (
       <div className="p-10">
@@ -59,157 +69,44 @@ const AgentDeliveryOrders = () => {
 
   return (
     <div className="w-full max-w-5xl px-4 py-6">
-      <h4 className="mb-6 text-xl font-semibold">Delivery Orders</h4>
+      <div className="mb-6">
+        <h4 className="text-xl font-semibold text-gray-900">Delivered Orders</h4>
+        <p className="mt-1 text-sm text-gray-500">
+          Manage and track your assigned Delivered orders
+        </p>
+      </div>
 
-      {deliveryOrders.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center">
-          <Rb_Text>No delivery orders found.</Rb_Text>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {deliveryOrders.map((order) => {
-            const item = order.items?.[0] ?? null;
+      <AgentOrderTabs
+        tabs={TABS}
+        activeTab={activeTab}
+        counts={counts}
+        onChange={setActiveTab}
+      />
 
-            return (
-              <div
-                key={order.orderId}
-                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
-              >
-                <div className="flex gap-4">
-                  <Rb_Image
-                    src={item?.coverImage || "/images/book-placeholder.png"}
-                    alt={item?.bookName || "Book cover"}
-                    className="h-20 w-16 shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
-                  />
+      <div className="space-y-3">
+        {filteredOrders.length === 0 && (
+          <EmptyOrdersState
+            message={EMPTY_STATE_COPY[activeTab] ?? "No orders in this category yet."}
+          />
+        )}
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <Rb_Text className="text-sm font-semibold text-gray-900">
-                          Order #
-                          {order.orderNumber?.replace(/^ORD/, "").slice(-6)}
-                        </Rb_Text>
-
-                        {item?.bookName && (
-                          <Rb_Text className="mt-1 truncate text-sm text-gray-800">
-                            {item.bookName}
-                          </Rb_Text>
-                        )}
-
-                        {item?.author && (
-                          <Rb_Text className="truncate text-xs text-gray-500">
-                            by {item.author}
-                          </Rb_Text>
-                        )}
-
-                        {order.items && order.items.length > 1 && (
-                          <Rb_Text className="mt-0.5 text-xs text-gray-400">
-                            +{order.items.length - 1} more item
-                            {order.items.length - 1 > 1 ? "s" : ""}
-                          </Rb_Text>
-                        )}
-                      </div>
-
-                      {order.orderStatus ===
-                      "Delivery Agent Assigned" ? (
-                        <div className="shrink-0">
-                        <Dropdown
-                          options={[
-                            {
-                              label: "Delivery Assigned",
-                              value: "Delivery Agent Assigned",
-                            },
-                            {
-                              label: "Out For Delivery",
-                              value: "Out For Delivery",
-                            },
-                          ]}
-                          value={order.orderStatus}
-                          onChange={(value) =>
-                            handleStatusChange(
-                              order,
-                              value as OrderStatus
-                            )
-                          }
-                        />
-                        </div>
-                      ) : (
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-                            order.orderStatus === "Delivered"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-blue-50 text-blue-700"
-                          }`}
-                        >
-                          <span
-                            className={`h-1.5 w-1.5 rounded-full ${
-                              order.orderStatus === "Delivered"
-                                ? "bg-emerald-500"
-                                : "bg-blue-500"
-                            }`}
-                          />
-                          {order.orderStatus}
-                        </span>
-                      )}
-                    </div>
-
-                    {order.userDetails && (
-                      <div className="mt-3 flex items-start gap-2 rounded-lg bg-gray-50 p-2.5">
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
-
-                        <div className="min-w-0">
-                          <Rb_Text className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
-                            Delivery Location
-                          </Rb_Text>
-
-                          <Rb_Text className="text-sm text-gray-700">
-                            {order.userDetails.address.street},{" "}
-                            {order.userDetails.address.city},{" "}
-                            {order.userDetails.address.state}
-                          </Rb_Text>
-
-                          <Rb_Text className="text-xs text-gray-400">
-                            {order.userDetails.address.zipCode}
-                          </Rb_Text>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                  <Rb_Text className="text-xs text-gray-400">
-                    Assigned{" "}
-                    {order.assignedDate
-                    ? new Date(order.assignedDate).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "—"}
-                  </Rb_Text>
-
-                  <Rb_Button
-                    variant="primary"
-                    onClick={() => {
-                      window.history.pushState(
-                        {},
-                        "",
-                        `/agent-orders/${order.shipmentId}`
-                      );
-                      window.dispatchEvent(
-                        new PopStateEvent("popstate")
-                      );
-                    }}
-                  >
-                    View Details
-                  </Rb_Button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+        {filteredOrders.map((order) => (
+          <AgentOrderCard
+            key={order.orderId}
+            order={order}
+            statusSlot={
+              <OrderStatusControl
+                order={order}
+                statusMeta={STATUS_META}
+                dropdownConfigs={DROPDOWN_CONFIGS}
+                onStatusChange={changeStatus}
+              />
+            }
+            locationSlot={<AgentOrderLocation order={order} />}
+            onViewDetails={(o) => navigateTo(`/agent-orders/${o.shipmentId}`)}
+          />
+        ))}
+      </div>
     </div>
   );
 };
