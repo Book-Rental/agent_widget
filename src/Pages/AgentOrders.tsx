@@ -4,10 +4,12 @@ import {
   Rb_Button,
   Rb_Image,
   Rb_Text,
+  Rb_LoadingSpinner,
 } from "@rentbook/rentbook-ui-lib";
 import type { AgentOrder, OrderStatus } from "../Types/AgentTypes";
 import { useAgentOrders } from "../hooks/useAgentOrders";
-// import { AgentOrderDetailsMock } from "../mock/AgentOrderDetails";
+import { STATUS_CONFIG } from "../constants/shipmentStatus";
+import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
 
 const STATUS_META: Partial<
   Record<
@@ -39,7 +41,7 @@ const STATUS_META: Partial<
     badge: "bg-emerald-50 text-emerald-700",
     dot: "bg-emerald-500",
   },
-  "Sorting Completed": {
+  "Arrived At Origin Hub": {
     label: "Completed",
     badge: "bg-indigo-50 text-indigo-700",
     dot: "bg-indigo-500",
@@ -66,7 +68,7 @@ const TABS = [
   { key: "Pickup Assigned", label: "Pickup Assigned" },
   { key: "Out For Pickup", label: "Out For Pickup" },
   { key: "Pickup Completed", label: "Pickup Completed" },
-  { key: "Sorting Completed", label: "Completed" },
+  { key: "Arrived At Origin Hub", label: "Completed" },
   // { key: "Delivery Agent Assigned", label: "Delivery Assigned" },
   // { key: "Out For Delivery", label: "Out For Delivery" },
   // { key: "Delivered", label: "Delivered" },
@@ -77,7 +79,7 @@ const EMPTY_STATE_COPY: Partial<Record<(typeof TABS)[number]["key"], string>> = 
   "Pickup Assigned": "No pickups have been assigned to you yet.",
   "Out For Pickup": "Nothing is currently out for pickup.",
   "Pickup Completed": "No completed pickups to show yet.",
-  "Sorting Completed": "No orders have finished sorting yet.",
+  "Arrived At Origin Hub": "No orders have finished sorting yet.",
   // "Delivery Agent Assigned": "No deliveries have been assigned to you yet.",
   // "Out For Delivery": "Nothing is currently out for delivery.",
   // Delivered: "You haven't delivered any orders yet.",
@@ -180,17 +182,13 @@ const EmptyState = ({ message }: { message: string }) => (
 
 const AgentOrders = () => {
   const agentId = "6a6b10202eb459f877594bb0";
-  const [activeTab, setActiveTab] =
-    useState<(typeof TABS)[number]["key"]>("all");
+  const { mutate: updateStatus } = useUpdateShipmentStatus();
+  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
+  const { data: orders = [], isPending, isError, } = useAgentOrders(agentId);
 
-  const {
-    data: orders = [],
-    isPending,
-    isError,
-  } = useAgentOrders(agentId);
-// const orders: AgentOrder[] = AgentOrderDetailsMock;
-// const isPending = false;
-// const isError = false;
+  // const orders: AgentOrder[] = AgentOrderDetailsMock;
+  // const isPending = false;
+  // const isError = false;
   const counts = useMemo(() => {
     const result: Record<string, number> = {
       all: orders.length,
@@ -207,10 +205,39 @@ const AgentOrders = () => {
     if (activeTab === "all") return orders;
     return orders.filter((order) => order.orderStatus === activeTab);
   }, [activeTab, orders]);
+  if (isPending) {
+    return <Rb_LoadingSpinner />;
+  }
 
-  const handleStatusChange = (orderId: string, status: OrderStatus) => {
-    // TODO: wire up to the actual status-update mutation
-    console.log("Order:", orderId, "New status:", status);
+  if (isError) {
+    return (
+      <div className="p-10">
+        <Rb_Text>Something went wrong</Rb_Text>
+      </div>
+    );
+  }
+  // const handleStatusChange = (orderId: string, status: OrderStatus) => {
+  //   // TODO: wire up to the actual status-update mutation
+  //   console.log("Order:", orderId, "New status:", status);
+  // };
+  const handleStatusChange = (
+    order: AgentOrder,
+    status: OrderStatus
+  ) => {
+
+    if (!order.shipmentId) return;
+
+    updateStatus({
+        shipmentId: order.shipmentId,
+
+        payload: {
+            status,
+            event: STATUS_CONFIG[status]!.event,
+            remarks: STATUS_CONFIG[status]!.remarks,
+            agentId,
+            updatedBy: agentId,
+        },
+    });
   };
 
   const navigateTo = (path: string) => {
@@ -249,8 +276,7 @@ const AgentOrders = () => {
       order.deliveryType === "SELLER_TO_HUB" &&
       order.hubDetails &&
       (order.orderStatus === "Pickup Completed" ||
-        order.orderStatus === "Arrived At Origin Hub" ||
-        order.orderStatus === "Sorting Completed")
+        order.orderStatus === "Arrived At Origin Hub" )
     ) {
       return (
         <div className="mt-3 flex items-start gap-2 rounded-lg bg-gray-50 p-2.5">
@@ -313,7 +339,8 @@ const AgentOrders = () => {
             ]}
             value={order.orderStatus}
             onChange={(value) =>
-              handleStatusChange(order.orderId, value as OrderStatus)
+              // handleStatusChange(order.orderId, value as OrderStatus)
+              handleStatusChange(order,value as OrderStatus)
             }
           />
         </div>
@@ -336,7 +363,8 @@ const AgentOrders = () => {
             ]}
             value={order.orderStatus}
             onChange={(value) =>
-              handleStatusChange(order.orderId, value as OrderStatus)
+              // handleStatusChange(order.orderId, value as OrderStatus)
+              handleStatusChange(order,value as OrderStatus)
             }
           />
         </div>
@@ -413,7 +441,7 @@ const AgentOrders = () => {
 
       {!isPending && isError && <ErrorState onRetry={() => refetch()} />} */}
 
-      {!isPending && !isError && (
+      {/* {!isPending && !isError && ( */}
         <div className="space-y-3">
           {filteredOrders.length === 0 && (
             <EmptyState
@@ -491,7 +519,7 @@ const AgentOrders = () => {
             );
           })}
         </div>
-      )}
+      {/* )} */}
     </div>
   );
 };

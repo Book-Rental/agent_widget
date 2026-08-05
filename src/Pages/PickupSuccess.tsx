@@ -1,4 +1,4 @@
-import { Rb_Button, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_Button, Rb_Text ,  Rb_LoadingSpinner} from "@rentbook/rentbook-ui-lib";
 import { useShipment } from "../hooks/useShipment";
 
 interface PickupSuccessProps {
@@ -37,7 +37,7 @@ const PickupSuccess = ({
   const shipment = data?.data;
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Rb_LoadingSpinner />;
   }
 
   if (isError || !shipment) {
@@ -148,7 +148,7 @@ const PickupSuccess = ({
       {/* Details */}
       <div className="mt-8 overflow-hidden rounded-xl border border-gray-200">
         <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
-          <Rb_Text className="text-gray-500">Order ID</Rb_Text>
+          <Rb_Text className="text-gray-500">Shiment ID</Rb_Text>
           <Rb_Text className="text-right text-gray-900">
             {shipment.orderId}
           </Rb_Text>

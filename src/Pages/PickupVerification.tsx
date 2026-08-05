@@ -3,6 +3,8 @@ import { Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib
 import { useShipment } from "../hooks/useShipment";
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
+import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
+import { STATUS_CONFIG } from "../constants/shipmentStatus";
 
 interface PickupVerificationProps {
   shipmentId: string;
@@ -13,7 +15,8 @@ const PickupVerification = ({
 }: PickupVerificationProps) => {
   const [photosComplete, setPhotosComplete] = useState(false);
   const [conditionSelected, setConditionSelected] = useState(false);
-
+  const agentId = "6a6b10202eb459f877594bb0";             
+  const { mutate: updateStatus } = useUpdateShipmentStatus();
   const {
     data,
     isLoading,
@@ -41,18 +44,45 @@ const PickupVerification = ({
   const isReturnPickup =
     shipment.shipmentType === "Return";
 
+  // const handleProceed = () => {
+  //   console.log("Shipment:", shipment);
+    
+  //   window.history.pushState(
+  //     {},
+  //     "",
+  //     `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
+  //   );
+
+  //   window.dispatchEvent(
+  //     new PopStateEvent("popstate")
+  //   );
+  // };
+
   const handleProceed = () => {
-    console.log("Shipment:", shipment);
+    updateStatus(
+      {
+        shipmentId: shipment.shipmentId,
+        payload: {
+          status: "Pickup Completed",
+          event: STATUS_CONFIG["Pickup Completed"]!.event,
+          remarks: STATUS_CONFIG["Pickup Completed"]!.remarks,
+          agentId,
+          updatedBy: agentId,
+        },
+      },
+      {
+        onSuccess: () => {
+          window.history.pushState(
+            {},
+            "",
+            `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
+          );
 
-    window.history.pushState(
-      {},
-      "",
-      //  `/agent-orders/${shipment.shipmentId}/confirmation`
-      `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
-    );
-
-    window.dispatchEvent(
-      new PopStateEvent("popstate")
+          window.dispatchEvent(
+            new PopStateEvent("popstate")
+          );
+        },
+      }
     );
   };
 
