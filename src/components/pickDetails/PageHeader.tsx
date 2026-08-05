@@ -21,26 +21,26 @@ const PageHeader = ({
   onStatusChange,
 }: Props) => {
   return (
-    <div className="mb-6 flex items-start justify-between">
-      <div>
-        <Rb_Text className="text-xl font-semibold">
-          {title}
-        </Rb_Text>
+    <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+    <div className="min-w-0 flex-1">
+      <Rb_Text className="text-2xl font-semibold md:text-3xl">
+        {title}
+      </Rb_Text>
 
-        <Rb_Text className="mt-1 text-sm text-gray-500">
-          Order ID #{orderNumber}
-        </Rb_Text>
-      </div>
+      <Rb_Text className="mt-1 break-all text-base font-medium text-slate-500">
+        Order ID #{orderNumber}
+      </Rb_Text>
+    </div>
 
-<div  className="shrink-0">
+    <div className="self-start md:self-auto">
       <StatusDropdown
         currentStatus={currentStatus}
         deliveryType={deliveryType}
         onChange={onStatusChange}
       />
-</div>
     </div>
-  );
-};
+  </div>
+    );
+  };
 
 export default PageHeader;

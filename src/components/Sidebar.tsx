@@ -50,21 +50,27 @@ const Sidebar = ({
     <>
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/30 md:hidden"
+          className="fixed left-0 right-0 top-16 bottom-0 z-40 bg-black/40 backdrop-blur-[1px] md:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
         className={`
-          fixed left-0 top-0 z-0
-          h-screen w-[240px]
-          border-r border-slate-200 bg-white
-          pt-6
-          transition-transform duration-300
-
-          md:static md:translate-x-0
-
+          fixed
+          left-0
+          top-16
+          z-[60]
+          h-[calc(100vh-4rem)]
+          w-[240px]
+          bg-white
+          shadow-[2px_0_8px_rgba(0,0,0,0.08)]
+          transition-transform
+          duration-300
+          md:static
+          md:z-auto
+          md:h-auto
+          md:translate-x-0
           ${
             mobileOpen
               ? "translate-x-0"

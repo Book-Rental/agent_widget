@@ -70,36 +70,43 @@ const AgentOrders = () => {
         </p>
       </div>
 
-      <AgentOrderTabs
-        tabs={TABS}
-        activeTab={activeTab}
-        counts={counts}
-        onChange={setActiveTab}
-      />
+      {orders.length > 0 && (
+        <AgentOrderTabs
+          tabs={TABS}
+          activeTab={activeTab}
+          counts={counts}
+          onChange={setActiveTab}
+        />
+      )}
 
       <div className="space-y-3">
-        {filteredOrders.length === 0 && (
+        {filteredOrders.length === 0 ? (
           <EmptyOrdersState
-            message={EMPTY_STATE_COPY[activeTab] ?? "No orders in this category yet."}
-          />
-        )}
-
-        {filteredOrders.map((order) => (
-          <AgentOrderCard
-            key={order.orderId}
-            order={order}
-            statusSlot={
-              <OrderStatusControl
-                order={order}
-                statusMeta={STATUS_META}
-                dropdownConfigs={DROPDOWN_CONFIGS}
-                onStatusChange={changeStatus}
-              />
+            message={
+              EMPTY_STATE_COPY[activeTab] ??
+              "No orders in this category yet."
             }
-            locationSlot={<AgentOrderLocation order={order} />}
-            onViewDetails={(o) => navigateTo(`/agent/pickup-orders/${o.shipmentId}`)}
           />
-        ))}
+        ) : (
+          filteredOrders.map((order) => (
+            <AgentOrderCard
+              key={order.orderId}
+              order={order}
+              statusSlot={
+                <OrderStatusControl
+                  order={order}
+                  statusMeta={STATUS_META}
+                  dropdownConfigs={DROPDOWN_CONFIGS}
+                  onStatusChange={changeStatus}
+                />
+              }
+              locationSlot={<AgentOrderLocation order={order} />}
+              onViewDetails={(o) =>
+                navigateTo(`/agent/pickup-orders/${o.shipmentId}`)
+              }
+            />
+          ))
+        )}
       </div>
     </div>
   );

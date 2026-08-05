@@ -44,7 +44,7 @@ const PickupSuccess = ({
     return <div>Unable to load shipment.</div>;
   }
   return (
-    <div className="mx-auto max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+    <div className="mx-auto max-w-lg rounded-xl bg-white p-6 shadow-md">
       {/* Scoped keyframes for effects that plain Tailwind utilities can't express */}
       <style>{`
         @keyframes popIn {
@@ -89,7 +89,7 @@ const PickupSuccess = ({
       {/* Success Icon */}
       {/* Fixed h-24/w-24 box (matching the circle exactly) so left-1/2 & top-1/2
           below line up with the true center — not the padded container's center. */}
-      <div className="relative mx-auto my-4 h-24 w-24">
+      <div className="relative mx-auto my-3 h-20 w-20">
         {/* Pulsing rings behind the circle — inset-0 keeps them exactly circle-sized/centered */}
         <span className="pickup-ring absolute inset-0 rounded-full bg-green-400" />
         <span
@@ -124,7 +124,7 @@ const PickupSuccess = ({
         <div className="pickup-circle absolute inset-0 flex items-center justify-center rounded-full bg-green-500 shadow-lg shadow-green-200">
           <svg
             viewBox="0 0 24 24"
-            className="h-12 w-12"
+            className="h-10 w-10"
             fill="none"
             stroke="white"
             strokeWidth={3}
@@ -148,7 +148,7 @@ const PickupSuccess = ({
       {/* Details */}
       <div className="mt-8 overflow-hidden rounded-xl border border-gray-200">
         <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
-          <Rb_Text className="text-gray-500">Shiment ID</Rb_Text>
+          <Rb_Text className="text-gray-500">Shipment ID</Rb_Text>
           <Rb_Text className="text-right text-gray-900">
             {shipment.orderId}
           </Rb_Text>
@@ -161,7 +161,17 @@ const PickupSuccess = ({
           </Rb_Text>
         </div> */}
 
-        <div className="grid grid-cols-2 border-b border-gray-200 px-5 py-4">
+        <div className="grid grid-cols-2 border-b border-gray-200 px-4 py-3">
+          <Rb_Text className="text-gray-500">
+            Seller
+          </Rb_Text>
+
+          <Rb_Text className="text-right font-medium text-gray-900">
+            {shipment.sender.name}
+          </Rb_Text>
+        </div>
+
+        <div className="grid grid-cols-2 border-b border-gray-200 px-4 py-3">
           <Rb_Text className="text-gray-500">
             Picked Up From
           </Rb_Text>
