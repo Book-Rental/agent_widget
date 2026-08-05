@@ -30,16 +30,16 @@ const ProgressTimeline = ({
               <div
                 className={`absolute left-[9px] top-5 h-full w-px ${
                   completed
-                    ? "bg-emerald-400"
+                    ? "bg-blue-400"
                     : "bg-gray-200"
                 }`}
               />
             )}
 
             <div
-              className={`relative z-10 flex h-5 w-5 items-center justify-center rounded-full ${
+              className={`relative z-0 flex h-5 w-5 items-center justify-center rounded-full ${
                 completed
-                  ? "bg-emerald-500"
+                  ? "bg-blue-500"
                   : "bg-gray-200"
               }`}
             >
