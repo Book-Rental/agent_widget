@@ -16,7 +16,8 @@ const ProgressTimeline = ({ timeline }: ProgressTimelineProps) => {
   const completedCount = timeline.filter((t) => t.date).length;
 
   return (
-    <div className="p-4 sm:p-5">
+    // Now matches StatusNoteCard: rounded-2xl border bg-white shadow-sm p-5
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <Rb_Text className="text-sm font-semibold text-gray-900">
           Progress

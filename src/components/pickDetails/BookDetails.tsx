@@ -11,7 +11,7 @@ const BookDetails = ({ item }: Props) => {
   if (!item) return null;
 
   return (
-    <div className="flex w-full items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="flex w-full items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4">
       <Rb_Image
         src={item.coverImage}
         alt={item.bookName}
