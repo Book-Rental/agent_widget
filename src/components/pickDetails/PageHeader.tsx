@@ -11,6 +11,7 @@ type Props = {
   currentStatus: OrderStatus;
   deliveryType: string;
   onStatusChange: (value: string) => void;
+  disabled?: boolean;
 };
 
 const PageHeader = ({
@@ -19,6 +20,7 @@ const PageHeader = ({
   currentStatus,
   deliveryType,
   onStatusChange,
+  disabled = false,
 }: Props) => {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
@@ -48,6 +50,7 @@ const PageHeader = ({
           currentStatus={currentStatus}
           deliveryType={deliveryType}
           onChange={onStatusChange}
+          disabled={disabled}
         />
       </div>
     </div>

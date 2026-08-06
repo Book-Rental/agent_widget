@@ -15,6 +15,7 @@ export type StatusDropdownConfig = {
   }[];
 };
 
+
 type Props = {
   order: AgentOrder;
   statusMeta: Partial<Record<OrderStatus, StatusMeta>>;
@@ -23,6 +24,7 @@ type Props = {
     order: AgentOrder,
     status: OrderStatus
   ) => void;
+  disabled?: boolean;
 };
 
 
@@ -31,24 +33,35 @@ export const OrderStatusControl = ({
   statusMeta,
   dropdownConfigs = [],
   onStatusChange,
+  disabled = false,
 }: Props) => {
 
   const dropdownConfig = dropdownConfigs.find(
-    (item) => item.triggerStatus === order.orderStatus
+    (config) =>
+      config.triggerStatus === order.orderStatus
   );
 
 
   if (dropdownConfig) {
     return (
-      <div className="min-w-[150px]">
-       
-          <Dropdown
-            options={dropdownConfig.options}
-            value={order.orderStatus}
-            onChange={(value) =>
-              onStatusChange(order, value as OrderStatus)
-            }
-          />
+      <div
+        className={
+          disabled
+            ? "min-w-[150px] cursor-not-allowed opacity-60"
+            : "min-w-[150px]"
+        }
+      >
+        <Dropdown
+          options={dropdownConfig.options}
+          value={order.orderStatus}
+          disabled={disabled}
+          onChange={(value) =>
+            onStatusChange(
+              order,
+              value as OrderStatus
+            )
+          }
+        />
       </div>
     );
   }
@@ -73,6 +86,7 @@ export const OrderStatusControl = ({
       <span
         className={`h-1.5 w-1.5 rounded-full ${meta.dot}`}
       />
+
       {meta.label}
     </span>
   );

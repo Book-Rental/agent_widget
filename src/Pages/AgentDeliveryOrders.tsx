@@ -34,7 +34,7 @@ const AgentDeliveryOrders = () => {
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
 const {
   onStatusChange,
-  isPending: isUpdatingStatus,
+  isUpdatingStatus,
 } = useAgentStatusChange(agentId);
  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
     const [currentPage, setCurrentPage] = useState(1);

@@ -1,18 +1,11 @@
 import { useUpdateShipmentStatus } from "./useUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
-import type {
-  AgentOrder,
-  OrderStatus,
-} from "../Types/AgentTypes";
+import type { AgentOrder, OrderStatus } from "../Types/AgentTypes";
 
-
-export const useAgentStatusChange = (
-  agentId:string
-) => {
-
+export const useAgentStatusChange = (agentId: string) => {
   const {
     mutate: updateStatus,
-    isPending,
+    isPending: isUpdatingStatus,
   } = useUpdateShipmentStatus();
 
 
@@ -20,27 +13,28 @@ export const useAgentStatusChange = (
     order: AgentOrder,
     status: OrderStatus
   ) => {
+    if (!order.shipmentId) return;
 
-    if(!order.shipmentId) return;
+    const config = STATUS_CONFIG[status];
+
+    if (!config) return;
 
 
     updateStatus({
       shipmentId: order.shipmentId,
-
-      payload:{
+      payload: {
         status,
-        event: STATUS_CONFIG[status]!.event,
-        remarks: STATUS_CONFIG[status]!.remarks,
+        event: config.event,
+        remarks: config.remarks,
         agentId,
-        updatedBy:agentId,
-      }
+        updatedBy: agentId,
+      },
     });
-
   };
 
 
   return {
     onStatusChange,
-    isPending,
+    isUpdatingStatus,
   };
 };
