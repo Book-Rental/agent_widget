@@ -36,6 +36,7 @@ const AgentOrders = () => {
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
 const {
   onStatusChange,
+   isUpdatingStatus,
 } = useAgentStatusChange(agentId);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,17 +102,6 @@ const counts = useMemo(() => {
 
 return (
 <>
-  {true  && (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="rounded-xl bg-white px-6 py-5 shadow-xl">
-        <Rb_LoadingSpinner />
-        <p className="mt-3 text-sm font-medium text-gray-600">
-          Updating status...
-        </p>
-      </div>
-    </div>
-  )}
-
   <div className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 py-6 sm:px-6">
     <div className="mb-6">
       <h4 className="text-xl font-semibold text-gray-900">
@@ -154,6 +144,7 @@ return (
                 statusMeta={STATUS_META}
                 dropdownConfigs={DROPDOWN_CONFIGS}
                 onStatusChange={onStatusChange}
+                disabled={isUpdatingStatus}
               />
             }
             locationSlot={<AgentOrderLocation order={order} />}

@@ -8,15 +8,31 @@ export const useUpdateShipmentStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       shipmentId,
       payload,
     }: {
       shipmentId: string;
       payload: UpdateShipmentStatusPayload;
-    }) => updateShipmentStatus(shipmentId, payload),
+    }) => {
+      console.log("Updating shipment:", {
+        shipmentId,
+        payload,
+      });
+
+      const response = await updateShipmentStatus(
+        shipmentId,
+        payload
+      );
+
+      console.log("Update response:", response);
+
+      return response;
+    },
 
     onSuccess: () => {
+      console.log("Mutation success");
+
       queryClient.invalidateQueries({
         queryKey: ["agent-orders"],
       });
@@ -25,11 +41,19 @@ export const useUpdateShipmentStatus = () => {
         queryKey: ["agentOrderDetails"],
       });
 
-      showToast("Shipment status updated successfully.", "success");
+      showToast(
+        "Shipment status updated successfully.",
+        "success"
+      );
     },
 
-    onError: () => {
-      showToast("Failed to update shipment status.", "error");
+    onError: (error) => {
+      console.error("Mutation error:", error);
+
+      showToast(
+        "Failed to update shipment status.",
+        "error"
+      );
     },
   });
 };

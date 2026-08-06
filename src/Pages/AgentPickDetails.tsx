@@ -12,7 +12,7 @@ import { LocationCard } from "../components/pickDetails/LocationCard";
 import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
-import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_Text } from "@rentbook/rentbook-ui-lib";
 // import StatusNoteCard from "../components/pickDetails/StatusNoteCard";
 
 type AgentPickDetailsProps = {
@@ -195,13 +195,13 @@ const {
 
   return (
     <>
-     {isUpdatingStatus && (
+     {/* {isUpdatingStatus && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
     <div className="rounded-xl bg-white p-6 shadow-lg">
       <Rb_LoadingSpinner />
     </div>
   </div>
-)}
+)} */}
     <div className="min-h-screen px-4 py-5">
       <div className="mx-auto max-w-7xl space-y-6">
        <PageHeader
@@ -215,6 +215,7 @@ const {
   currentStatus={currentStatus}
   deliveryType={order.deliveryType}
   onStatusChange={handleStatusChange}
+   disabled={isUpdatingStatus}
 />
 
         <div className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">

@@ -6,15 +6,25 @@ type Props = {
   currentStatus: OrderStatus;
   deliveryType: string;
   onChange: (value: string) => void;
-   isPending?: boolean;
+  disabled?: boolean;
 };
 
 const StatusDropdown = ({
   currentStatus,
   deliveryType,
   onChange,
+  disabled = false,
 }: Props) => {
   const meta = STATUS_META[currentStatus];
+
+  const dropdownProps = {
+    value: currentStatus,
+    onChange,
+    disabled,
+    className: disabled
+      ? "cursor-not-allowed opacity-60"
+      : "cursor-pointer",
+  };
 
   if (
     deliveryType === "SELLER_TO_HUB" &&
@@ -22,8 +32,7 @@ const StatusDropdown = ({
   ) {
     return (
       <Dropdown
-        value={currentStatus}
-        onChange={onChange}
+        {...dropdownProps}
         options={[
           {
             label: "Pickup Assigned",
@@ -44,8 +53,7 @@ const StatusDropdown = ({
   ) {
     return (
       <Dropdown
-        value={currentStatus}
-        onChange={onChange}
+        {...dropdownProps}
         options={[
           {
             label: "Delivery Agent Assigned",
