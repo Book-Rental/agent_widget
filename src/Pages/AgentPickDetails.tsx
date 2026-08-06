@@ -13,16 +13,11 @@ import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { Rb_Text } from "@rentbook/rentbook-ui-lib";
+// import StatusNoteCard from "../components/pickDetails/StatusNoteCard";
 
 type AgentPickDetailsProps = {
   shipmentId: string;
 };
-
-const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-  <Rb_Text className="px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
-    {children}
-  </Rb_Text>
-);
 
 const Shimmer = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse rounded-lg bg-gray-100 ${className}`} />
@@ -82,8 +77,7 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
   const hub = order?.hubDetails;
 
   const showSellerDetails =
-    isSellerToHub &&
-    ["Pickup Assigned", "Out For Pickup"].includes(currentStatus);
+    isSellerToHub && ["Pickup Assigned", "Out For Pickup"].includes(currentStatus);
 
   const showHubDetails =
     isSellerToHub &&
@@ -195,128 +189,101 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
     );
   }
 
+  const contactLabel = isHubToUser ? "Delivery Contact" : "Pickup Contact";
+
   return (
-    <div className="min-h-screen px-4 py-4 pb-4 mt-5">
-      <div className="mx-auto max-w-6xl space-y-4">
-        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-          <PageHeader
-            title={order.deliveryType === "HUB_TO_USER" ? "Delivery Details" : "Pickup Details"}
-            order={order}
-            orderNumber={order.orderNumber}
-            currentStatus={currentStatus}
-            deliveryType={order.deliveryType}
-            onStatusChange={handleStatusChange}
-          />
-        </div>
-
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_340px]">
-          {/* Right rail comes first on mobile so agents see status/actions immediately */}
-          <div className="order-1 space-y-4 self-start xl:sticky xl:top-4 xl:order-2">
-            <div
-              className="rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md animate-in fade-in slide-in-from-right-2 duration-300"
-              style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
-            >
-              <ProgressTimeline timeline={timeline} />
-            </div>
-
-            <div
-              className="animate-in fade-in slide-in-from-right-2 duration-300"
-              style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
-            >
-              <ActionCard
-                status={currentStatus}
-                onVerify={goToVerification}
-                onSorting={() => handleStatusChange("Sorting Completed")}
-                onDelivered={() => handleStatusChange("Delivered")}
-              />
-            </div>
-          </div>
-
-          {/* Left Section */}
-          <div className="order-2 space-y-5 xl:order-1">
-            <div
-              className="animate-in fade-in slide-in-from-left-2 duration-300"
-              style={{ animationFillMode: "backwards" }}
-            >
-              <BookDetails item={order.items[0]} />
-            </div>
-
-            {/* Contact + Location */}
-            {(showSellerDetails || showHubDetails || isHubToUser) && (
-              <div
-                className="space-y-2 animate-in fade-in slide-in-from-left-2 duration-300"
-                style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
-              >
-                <SectionLabel>
-                  {isHubToUser ? "Delivery contact" : "Pickup contact"}
-                </SectionLabel>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(280px,360px)_minmax(280px,360px)]">
-  {showSellerDetails && seller && (
-    <ContactCard
-      title="Pickup Contact"
-      name={seller.name}
-      phone={seller.phoneNumber}
-      onCall={() => callPhone(seller.phoneNumber)}
-    />
-  )}
-
-  {showSellerDetails && seller?.address && (
-    <LocationCard
-      title="Pickup Location"
-      subtitle="Seller pickup address"
-      name={seller.address.name}
-      address={seller.address.street}
-      city={`${seller.address.city}, ${seller.address.state}`}
-      zipCode={seller.address.zipCode}
-      onMap={() => openMaps(seller.address.location)}
-    />
-  )}
-
-  {showHubDetails && hub && (
-    <>
-      <ContactCard
-        title="Hub Contact"
-        name={hub.name}
-        onCall={() => {}}
-      />
-
-      <LocationCard
-        title="Hub Details"
-        subtitle="Submit book to hub"
-        name={hub.name}
-        address={hub.address}
-        city={`${hub.city}, ${hub.state}`}
-        onMap={() => {}}
-      />
-    </>
-  )}
-
-  {isHubToUser && user && (
-    <>
-      <ContactCard
-        title="Delivery Contact"
-        name={user.name}
-        phone={user.phoneNumber}
-        onCall={() => callPhone(user.phoneNumber)}
-      />
-
-      {user.address && (
-        <LocationCard
-          title="Delivery Location"
-          subtitle="Customer address"
-          name={user.name}
-          address={user.address.street}
-          city={`${user.address.city}, ${user.address.state}`}
-          zipCode={user.address.zipCode}
-          onMap={() => openMaps(user.address.location)}
+    <div className="min-h-screen px-4 py-5">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <PageHeader
+          title={order.deliveryType === "HUB_TO_USER" ? "Delivery Details" : "Pickup Details"}
+          order={order}
+          orderNumber={order.orderNumber}
+          currentStatus={currentStatus}
+          deliveryType={order.deliveryType}
+          onStatusChange={handleStatusChange}
         />
-      )}
-    </>
-  )}
-</div>
+
+        <div className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">
+          {/* Left column */}
+          <div className="space-y-6">
+            <BookDetails item={order.items[0]} />
+
+            {(showSellerDetails || showHubDetails || isHubToUser) && (
+              <div className="grid items-stretch gap-6 md:grid-cols-2">
+                {showSellerDetails && seller && (
+                  <>
+                    <ContactCard
+                      title={contactLabel}
+                      name={seller.name}
+                      phone={seller.phoneNumber}
+                      onCall={() => callPhone(seller.phoneNumber)}
+                    />
+
+                    {seller.address && (
+                      <LocationCard
+                        title="Pickup Location"
+                        subtitle="Seller pickup address"
+                        name={seller.address.name}
+                        address={seller.address.street}
+                        city={`${seller.address.city}, ${seller.address.state}`}
+                        zipCode={seller.address.zipCode}
+                        onMap={() => openMaps(seller.address.location)}
+                      />
+                    )}
+                  </>
+                )}
+
+                {showHubDetails && hub && (
+                  <>
+                    <ContactCard title="Hub Contact" name={hub.name} onCall={() => {}} />
+
+                    <LocationCard
+                      title="Hub Details"
+                      subtitle="Submit book to hub"
+                      name={hub.name}
+                      address={hub.address}
+                      city={`${hub.city}, ${hub.state}`}
+                      onMap={() => {}}
+                    />
+                  </>
+                )}
+
+                {isHubToUser && user && (
+                  <>
+                    <ContactCard
+                      title={contactLabel}
+                      name={user.name}
+                      phone={user.phoneNumber}
+                      onCall={() => callPhone(user.phoneNumber)}
+                    />
+
+                    {user.address && (
+                      <LocationCard
+                        title="Delivery Location"
+                        subtitle="Customer address"
+                        name={user.name}
+                        address={user.address.street}
+                        city={`${user.address.city}, ${user.address.state}`}
+                        zipCode={user.address.zipCode}
+                        onMap={() => openMaps(user.address.location)}
+                      />
+                    )}
+                  </>
+                )}
               </div>
             )}
+          </div>
+
+          {/* Right sidebar */}
+          <div className="space-y-6 xl:sticky xl:top-5">
+            {/* <StatusNoteCard status={currentStatus} /> */}
+            <ProgressTimeline timeline={timeline} />
+            <ActionCard
+              status={currentStatus}
+              onVerify={goToVerification}
+              onSorting={() => handleStatusChange("Sorting Completed")}
+              onDelivered={() => handleStatusChange("Delivered")}
+            />
           </div>
         </div>
       </div>
