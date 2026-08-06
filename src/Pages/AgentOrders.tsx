@@ -85,55 +85,58 @@ const AgentOrders = () => {
   );
 }
 
-  return (
-    <div className="w-full max-w-5xl px-4 py-6 sm:px-6">
-      <div className="mb-6">
-        <h4 className="text-xl font-semibold text-gray-900">Pick Up Orders</h4>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage and track your assigned pickup orders
-        </p>
-      </div>
+return (
+  <div className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 py-6 sm:px-6">
+    <div className="mb-6">
+      <h4 className="text-xl font-semibold text-gray-900">
+        Pick Up Orders
+      </h4>
 
-      {orders.length > 0 && (
-        <AgentOrderTabs
-          tabs={TABS}
-          activeTab={activeTab}
-          counts={counts}
-          onChange={setActiveTab}
+      <p className="mt-1 text-sm text-gray-500">
+        Manage and track your assigned pickup orders
+      </p>
+    </div>
+
+    {orders.length > 0 && (
+      <AgentOrderTabs
+        tabs={TABS}
+        activeTab={activeTab}
+        counts={counts}
+        onChange={setActiveTab}
+      />
+    )}
+
+    <div className="space-y-4">
+      {filteredOrders.length === 0 ? (
+        <EmptyOrdersState
+          message={
+            EMPTY_STATE_COPY[activeTab] ??
+            "No orders in this category yet."
+          }
         />
-      )}
-
-      <div className="space-y-3">
-        {filteredOrders.length === 0 ? (
-          <EmptyOrdersState
-            message={
-              EMPTY_STATE_COPY[activeTab] ??
-              "No orders in this category yet."
+      ) : (
+        filteredOrders.map((order) => (
+          <AgentOrderCard
+            key={order.orderId}
+            order={order}
+            statusSlot={
+              <OrderStatusControl
+                order={order}
+                statusMeta={STATUS_META}
+                dropdownConfigs={DROPDOWN_CONFIGS}
+                onStatusChange={changeStatus}
+              />
+            }
+            locationSlot={<AgentOrderLocation order={order} />}
+            onViewDetails={(o) =>
+              navigateTo(`/agent/pickup-orders/${o.shipmentId}`)
             }
           />
-        ) : (
-          filteredOrders.map((order) => (
-            <AgentOrderCard
-              key={order.orderId}
-              order={order}
-              statusSlot={
-                <OrderStatusControl
-                  order={order}
-                  statusMeta={STATUS_META}
-                  dropdownConfigs={DROPDOWN_CONFIGS}
-                  onStatusChange={changeStatus}
-                />
-              }
-              locationSlot={<AgentOrderLocation order={order} />}
-              onViewDetails={(o) =>
-                navigateTo(`/agent/pickup-orders/${o.shipmentId}`)
-              }
-            />
-          ))
-        )}
-      </div>
+        ))
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default AgentOrders;
