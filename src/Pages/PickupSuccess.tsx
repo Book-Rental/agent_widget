@@ -1,5 +1,6 @@
 import { Rb_Button, Rb_Text ,  Rb_LoadingSpinner} from "@rentbook/rentbook-ui-lib";
 import { useShipment } from "../hooks/useShipment";
+import { FiAlertCircle } from "react-icons/fi";
 
 interface PickupSuccessProps {
   // orderId: string;
@@ -41,8 +42,25 @@ const PickupSuccess = ({
   }
 
   if (isError || !shipment) {
-    return <div>Unable to load shipment.</div>;
-  }
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center px-6">
+      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+          <FiAlertCircle className="text-3xl text-red-500" />
+        </div>
+
+        <Rb_Text className="text-xl font-semibold text-gray-900">
+          Couldn't Load Confirmation
+        </Rb_Text>
+
+        <Rb_Text className="mt-2 text-sm text-gray-500">
+          We couldn't load the shipment confirmation details right now. Please
+          try again in a moment.
+        </Rb_Text>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="mx-auto max-w-lg rounded-xl bg-white p-6 shadow-md">
       {/* Scoped keyframes for effects that plain Tailwind utilities can't express */}

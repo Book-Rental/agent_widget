@@ -12,6 +12,7 @@ import { STATUS_CONFIG } from "../constants/shipmentStatus";
 
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
+import { FiAlertCircle } from "react-icons/fi";
 
 interface PickupVerificationProps {
   shipmentId: string;
@@ -42,13 +43,39 @@ const PickupVerification = ({
   }
 
   if (isError || !shipment) {
-    return (
-      <div>
-        Error loading shipment.
-        {error instanceof Error && <p>{error.message}</p>}
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center px-6">
+      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+  <FiAlertCircle className="text-3xl text-red-500" />
+</div>
+        </div>
+
+        <Rb_Text className="text-xl font-semibold text-gray-900">
+          Unable to Load Shipment
+        </Rb_Text>
+
+        <Rb_Text className="mt-2 text-sm text-gray-500">
+          We couldn't fetch the shipment details at the moment.
+        </Rb_Text>
+
+        {error instanceof Error && (
+          <Rb_Text className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            {error.message}
+          </Rb_Text>
+        )}
+
+        <div className="mt-6">
+          <Rb_Button
+            variant="primary"
+            onClick={() => window.location.reload()}
+          >Try Again</Rb_Button>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   const isReturnPickup = shipment.shipmentType === "Return";
 
