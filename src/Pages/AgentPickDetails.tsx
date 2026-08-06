@@ -12,7 +12,7 @@ import { LocationCard } from "../components/pickDetails/LocationCard";
 import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
-import { Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 // import StatusNoteCard from "../components/pickDetails/StatusNoteCard";
 
 type AgentPickDetailsProps = {
@@ -118,8 +118,10 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
     });
   }, [order]);
 
-  const { mutate: updateStatus } = useUpdateShipmentStatus();
-  const agentId = window.HOST_USER_INFO?.referenceId ?? "";
+const {
+  mutate: updateStatus,
+  isPending: isUpdatingStatus,
+} = useUpdateShipmentStatus(); const agentId = window.HOST_USER_INFO?.referenceId ?? "";
 
   const handleStatusChange = (value: string) => {
     if (!order) return;
@@ -192,16 +194,28 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
   const contactLabel = isHubToUser ? "Delivery Contact" : "Pickup Contact";
 
   return (
+    <>
+     {isUpdatingStatus && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div className="rounded-xl bg-white p-6 shadow-lg">
+      <Rb_LoadingSpinner />
+    </div>
+  </div>
+)}
     <div className="min-h-screen px-4 py-5">
       <div className="mx-auto max-w-7xl space-y-6">
-        <PageHeader
-          title={order.deliveryType === "HUB_TO_USER" ? "Delivery Details" : "Pickup Details"}
-          order={order}
-          orderNumber={order.orderNumber}
-          currentStatus={currentStatus}
-          deliveryType={order.deliveryType}
-          onStatusChange={handleStatusChange}
-        />
+       <PageHeader
+  title={
+    order.deliveryType === "HUB_TO_USER"
+      ? "Delivery Details"
+      : "Pickup Details"
+  }
+  order={order}
+  orderNumber={order.orderNumber}
+  currentStatus={currentStatus}
+  deliveryType={order.deliveryType}
+  onStatusChange={handleStatusChange}
+/>
 
         <div className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">
           {/* Left column */}
@@ -288,6 +302,7 @@ const AgentPickDetails = ({ shipmentId }: AgentPickDetailsProps) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

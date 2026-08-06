@@ -26,8 +26,8 @@ const PickupVerification = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // const agentId = "6a6b29dbf447531ecb351110";
-const agentId = window.HOST_USER_INFO?.referenceId ?? "";
-  const { mutate: updateStatus } = useUpdateShipmentStatus();
+  const agentId = window.HOST_USER_INFO?.referenceId ?? "";
+  const { mutate: updateStatus, isPending: isUpdatingStatus, } = useUpdateShipmentStatus();
 
   const {
     data,
@@ -43,68 +43,70 @@ const agentId = window.HOST_USER_INFO?.referenceId ?? "";
   }
 
   if (isError || !shipment) {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-  <FiAlertCircle className="text-3xl text-red-500" />
-</div>
-        </div>
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-6">
+        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+              <FiAlertCircle className="text-3xl text-red-500" />
+            </div>
+          </div>
 
-        <Rb_Text className="text-xl font-semibold text-gray-900">
-          Unable to Load Shipment
-        </Rb_Text>
-
-        <Rb_Text className="mt-2 text-sm text-gray-500">
-          We couldn't fetch the shipment details at the moment.
-        </Rb_Text>
-
-        {error instanceof Error && (
-          <Rb_Text className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-            {error.message}
+          <Rb_Text className="text-xl font-semibold text-gray-900">
+            Unable to Load Shipment
           </Rb_Text>
-        )}
 
-        <div className="mt-6">
-          <Rb_Button
-            variant="primary"
-            onClick={() => window.location.reload()}
-          >Try Again</Rb_Button>
+          <Rb_Text className="mt-2 text-sm text-gray-500">
+            We couldn't fetch the shipment details at the moment.
+          </Rb_Text>
+
+          {error instanceof Error && (
+            <Rb_Text className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              {error.message}
+            </Rb_Text>
+          )}
+
+          <div className="mt-6">
+            <Rb_Button
+              variant="primary"
+              onClick={() => window.location.reload()}
+            >Try Again</Rb_Button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   const isReturnPickup = shipment.shipmentType === "Return";
 
   const handleProceed = () => {
-    updateStatus(
-      {
-        shipmentId: shipment.shipmentId,
-        payload: {
-          status: "Pickup Completed",
-          event: STATUS_CONFIG["Pickup Completed"]!.event,
-          remarks: STATUS_CONFIG["Pickup Completed"]!.remarks,
-          agentId,
-          updatedBy: agentId,
-        },
-      },
-      {
-        onSuccess: () => {
-          setShowConfirmation(false);
+    if (isUpdatingStatus) return;
 
-          window.history.pushState(
-            {},
-            "",
-            `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
-          );
+   updateStatus(
+  {
+    shipmentId: shipment.shipmentId,
+    payload: {
+      status: "Pickup Completed",
+      event: STATUS_CONFIG["Pickup Completed"]!.event,
+      remarks: STATUS_CONFIG["Pickup Completed"]!.remarks,
+      agentId,
+      updatedBy: agentId,
+    },
+  },
+  {
+    onSuccess: () => {
+      setShowConfirmation(false);
 
-          window.dispatchEvent(new PopStateEvent("popstate"));
-        },
-      }
-    );
+      window.history.pushState(
+        {},
+        "",
+        `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
+      );
+
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    },
+  }
+);
   };
 
   return (
@@ -202,9 +204,13 @@ const agentId = window.HOST_USER_INFO?.referenceId ?? "";
           </Rb_Button>
         </div>
       </div>
-<Modal
+      <Modal
   isOpen={showConfirmation}
-  onClose={() => setShowConfirmation(false)}
+  onClose={() => {
+    if (!isUpdatingStatus) {
+      setShowConfirmation(false);
+    }
+  }}
 >
   <div className="w-[480px] max-w-full p-6">
     <h2 className="text-xl font-semibold text-gray-900">
@@ -228,6 +234,7 @@ const agentId = window.HOST_USER_INFO?.referenceId ?? "";
     <div className="mt-6 flex justify-end gap-3">
       <Rb_Button
         variant="secondary"
+        disabled={isUpdatingStatus}
         onClick={() => setShowConfirmation(false)}
       >
         Cancel
@@ -235,10 +242,18 @@ const agentId = window.HOST_USER_INFO?.referenceId ?? "";
 
       <Rb_Button
         variant="primary"
+        disabled={isUpdatingStatus}
         onClick={handleProceed}
-        className="!border-red-600 !bg-red-600 !text-white hover:!bg-red-700"
+        className="min-w-[160px] !border-red-600 !bg-red-600 !text-white hover:!bg-red-700"
       >
-        Confirm Pickup
+        {isUpdatingStatus ? (
+          <span className="flex items-center justify-center gap-2">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            Updating...
+          </span>
+        ) : (
+          "Confirm Pickup"
+        )}
       </Rb_Button>
     </div>
   </div>
