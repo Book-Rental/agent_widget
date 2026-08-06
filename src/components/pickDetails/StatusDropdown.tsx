@@ -6,6 +6,7 @@ type Props = {
   currentStatus: OrderStatus;
   deliveryType: string;
   onChange: (value: string) => void;
+   isPending?: boolean;
 };
 
 const StatusDropdown = ({

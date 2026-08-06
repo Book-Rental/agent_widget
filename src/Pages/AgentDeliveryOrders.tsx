@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
 import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
@@ -32,10 +32,16 @@ const navigateTo = (path: string) => {
 const AgentDeliveryOrders = () => {
   // const agentId = "6a6b29dbf447531ecb351110";
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
-  const changeStatus = useAgentStatusChange(agentId);
-  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
-  const { data: orders = [], isPending, isError } = useAgentOrders(agentId);
+const {
+  onStatusChange,
+  isPending: isUpdatingStatus,
+} = useAgentStatusChange(agentId);
+ const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
+    const [currentPage, setCurrentPage] = useState(1);
 
+  const { data, isPending, isError } = useAgentOrders(agentId, currentPage);
+const orders = data?.orders ?? [];
+const meta = data?.meta;
   const deliveryOrders = useMemo(
     () =>
       orders.filter((order) =>
@@ -91,6 +97,18 @@ const AgentDeliveryOrders = () => {
   );
 }
   return (
+    <>
+     {isUpdatingStatus && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+        <div className="rounded-xl bg-white p-6 shadow-lg">
+          <Rb_LoadingSpinner />
+          <Rb_Text className="mt-3 text-sm text-gray-600">
+            Updating status...
+          </Rb_Text>
+        </div>
+      </div>
+    )}
+
     <div className="w-full max-w-5xl px-4 py-6">
       <div className="mb-6">
         <h4 className="text-xl font-semibold text-gray-900">Delivered Orders</h4>
@@ -123,11 +141,11 @@ const AgentDeliveryOrders = () => {
                 order={order}
                 statusSlot={
                   <OrderStatusControl
-                    order={order}
-                    statusMeta={STATUS_META}
-                    dropdownConfigs={DROPDOWN_CONFIGS}
-                    onStatusChange={changeStatus}
-                  />
+  order={order}
+  statusMeta={STATUS_META}
+  dropdownConfigs={DROPDOWN_CONFIGS}
+  onStatusChange={onStatusChange}
+/>
                 }
                 locationSlot={<AgentOrderLocation order={order} />}
                 onViewDetails={(o) =>
@@ -137,7 +155,18 @@ const AgentDeliveryOrders = () => {
             ))
           )}
         </div>
+    {meta && meta.totalRecords > meta.limit && (
+  <div className="mt-6 flex justify-center">
+    <Pagination
+      currentPage={currentPage}
+      totalPages={meta.totalPages}
+      onPageChange={setCurrentPage}
+      disabled={isPending}
+    />
+  </div>
+)}
     </div>
+        </>
   );
 };
 

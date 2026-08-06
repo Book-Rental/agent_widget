@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { EmptyOrdersState } from "../components/orderDetails/EmptyState";
 import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
@@ -34,17 +34,31 @@ const navigateTo = (path: string) => {
 const AgentOrders = () => {
   // const agentId = "6a6b29dbf447531ecb351110";
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
-  const changeStatus = useAgentStatusChange(agentId);
+const {
+  onStatusChange,
+} = useAgentStatusChange(agentId);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
-  const { data: orders = [], isPending, isError } = useAgentOrders(agentId);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const counts = useMemo(() => {
-    const result: Record<string, number> = { all: orders.length };
-    orders.forEach((order) => {
-      result[order.orderStatus] = (result[order.orderStatus] || 0) + 1;
-    });
-    return result;
-  }, [orders]);
+  const { data, isPending, isError } = useAgentOrders(agentId, currentPage);
+const orders = data?.orders ?? [];
+const meta = data?.meta;
+
+const counts = useMemo(() => {
+  const result: Record<string, number> = {
+    all: meta?.totalRecords ?? 0,
+  };
+
+  TABS.forEach((tab) => {
+    if (tab.key !== "all") {
+      result[tab.key] = orders.filter(
+        (order) => order.orderStatus === tab.key
+      ).length;
+    }
+  });
+
+  return result;
+}, [orders, meta]);
 
   const filteredOrders = useMemo(() => {
     if (activeTab === "all") return orders;
@@ -86,6 +100,18 @@ const AgentOrders = () => {
 }
 
 return (
+<>
+  {true  && (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="rounded-xl bg-white px-6 py-5 shadow-xl">
+        <Rb_LoadingSpinner />
+        <p className="mt-3 text-sm font-medium text-gray-600">
+          Updating status...
+        </p>
+      </div>
+    </div>
+  )}
+
   <div className="mx-auto w-full max-w-6xl overflow-x-hidden px-4 py-6 sm:px-6">
     <div className="mb-6">
       <h4 className="text-xl font-semibold text-gray-900">
@@ -102,7 +128,10 @@ return (
         tabs={TABS}
         activeTab={activeTab}
         counts={counts}
-        onChange={setActiveTab}
+        onChange={(tab) => {
+          setActiveTab(tab);
+          setCurrentPage(1);
+        }}
       />
     )}
 
@@ -124,7 +153,7 @@ return (
                 order={order}
                 statusMeta={STATUS_META}
                 dropdownConfigs={DROPDOWN_CONFIGS}
-                onStatusChange={changeStatus}
+                onStatusChange={onStatusChange}
               />
             }
             locationSlot={<AgentOrderLocation order={order} />}
@@ -135,7 +164,21 @@ return (
         ))
       )}
     </div>
+
+    {activeTab === "all" &&
+      meta &&
+      meta.totalRecords > meta.limit && (
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={meta.totalPages}
+            onPageChange={setCurrentPage}
+            disabled={isPending}
+          />
+        </div>
+      )}
   </div>
+</>
 );
 };
 
