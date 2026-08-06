@@ -79,7 +79,7 @@ const Sidebar = ({
         `}
       >
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between px-5">
+        <div className="flex items-center justify-between px-5 pt-6 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600 text-sm font-bold text-white">
               A
@@ -103,24 +103,17 @@ const Sidebar = ({
 
 
         {/* Navigation */}
-        <div className="flex flex-col gap-1 px-5">
+        <div className="flex flex-col gap-1 px-5 pt-2">
 
           <button
             onClick={() => setOrdersOpen(!ordersOpen)}
-            className="
-              flex items-center justify-between
-              rounded-md p-2
-              text-sm font-semibold
-              text-slate-700
-              hover:bg-slate-50
-            "
-          >
+            className="flex items-center justify-between rounded-md p-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             Orders
 
             {
               ordersOpen
                 ? <FiChevronUp size={18}/>
-                : <FiChevronDown size={18}/>
+                : <FiChevronDown size={18} className={`transition-transform duration-200 ${ordersOpen ? "rotate-180" : ""}`}/>
             }
 
           </button>

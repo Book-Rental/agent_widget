@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { EmptyOrdersState } from "../components/orderDetails/EmptyState";
 import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
@@ -8,6 +8,7 @@ import { DROPDOWN_CONFIGS, STATUS_META } from "../components/orderDetails/Agento
 import { AgentOrderLocation } from "../components/orderDetails/Agentorderlocation";
 import { AgentOrderTabs } from "../components/orderDetails/Agentordertabs";
 import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
+import { FiAlertCircle } from "react-icons/fi";
 
 const TABS = [
   { key: "all", label: "All Orders" },
@@ -54,12 +55,34 @@ const AgentOrders = () => {
   }
 
   if (isError) {
-    return (
-      <div className="p-10">
-        <Rb_Text>Something went wrong</Rb_Text>
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center px-6">
+      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+  <FiAlertCircle className="text-3xl text-red-500" />
+</div>
+        </div>
+
+        <Rb_Text className="text-xl font-semibold text-gray-900">
+          Oops! Something went wrong
+        </Rb_Text>
+
+        <Rb_Text className="mt-2 text-sm text-gray-500">
+          We couldn't load your order details right now. Please try again in a
+          few moments.
+        </Rb_Text>
+
+        <Rb_Button
+          onClick={() => window.location.reload()}
+          className="mt-6 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+        >
+          Try Again
+        </Rb_Button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="w-full max-w-5xl px-4 py-6 sm:px-6">

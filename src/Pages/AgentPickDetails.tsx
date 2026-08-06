@@ -13,6 +13,7 @@ import ActionCard from "../components/pickDetails/ActionCard";
 import { LocationCard } from "../components/pickDetails/LocationCard";
 import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
+import { FiAlertCircle } from "react-icons/fi";
 
 type AgentPickDetailsProps = {
    shipmentId: string;
@@ -152,13 +153,27 @@ return statuses.map((status) => {
     );
   }
 
-  if (isError || !order) {
-    return (
-      <div className="p-10">
-        <Rb_Text>Order not found</Rb_Text>
+
+if (isError || !order) {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center px-6">
+      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+          <FiAlertCircle className="text-3xl text-red-500" />
+        </div>
+
+        <Rb_Text className="text-xl font-semibold text-gray-900">
+          Couldn't Load Order
+        </Rb_Text>
+
+        <Rb_Text className="mt-2 text-sm text-gray-500">
+          We couldn't load the order details right now. Please try again in a
+          moment.
+        </Rb_Text>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen px-4 py-6">
