@@ -30,8 +30,8 @@ const navigateTo = (path: string) => {
 };
 
 const AgentDeliveryOrders = () => {
-  const agentId = "6a6b29dbf447531ecb351110";
-  // const agentId = window.HOST_USER_INFO?._id ?? "";
+  // const agentId = "6a6b29dbf447531ecb351110";
+  const agentId = window.HOST_USER_INFO?.referenceId ?? "";
   const changeStatus = useAgentStatusChange(agentId);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
   const { data: orders = [], isPending, isError } = useAgentOrders(agentId);
