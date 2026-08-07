@@ -141,11 +141,11 @@ const meta = data?.meta;
                 order={order}
                 statusSlot={
                   <OrderStatusControl
-  order={order}
-  statusMeta={STATUS_META}
-  dropdownConfigs={DROPDOWN_CONFIGS}
-  onStatusChange={onStatusChange}
-/>
+                    order={order}
+                    statusMeta={STATUS_META}
+                    dropdownConfigs={DROPDOWN_CONFIGS}
+                    onStatusChange={onStatusChange}
+                  />
                 }
                 locationSlot={<AgentOrderLocation order={order} />}
                 onViewDetails={(o) =>
@@ -155,17 +155,18 @@ const meta = data?.meta;
             ))
           )}
         </div>
-    {meta && meta.totalRecords > meta.limit && (
-  <div className="mt-6 flex justify-center">
-    <Pagination
-      currentPage={currentPage}
-      totalPages={meta.totalPages}
-      onPageChange={setCurrentPage}
-      disabled={isPending}
-    />
-  </div>
-)}
-    </div>
+          {deliveryOrders.length > 0 &&
+            meta &&
+            meta.totalPages > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={meta.totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+        </div>
         </>
   );
 };
