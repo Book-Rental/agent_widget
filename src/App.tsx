@@ -71,11 +71,24 @@ function App({ module, view, shipmentId }: AppProps) {
       }
     }
 
-    if (module === "delivery" && view === "orders") {
-      return <AgentDeliveryOrders />;
-    }
+    if (module === "delivery") {
+    switch (view) {
+      case "orders":
+        return <AgentDeliveryOrders />;
 
-    return <AgentOrders />;
+      case "details":
+        return shipmentId ? (
+          <AgentPickDetails shipmentId={shipmentId} />
+        ) : null;
+
+      case "verification":
+      case "confirmation":
+        // Not built yet — see note below
+        return shipmentId ? (
+          <AgentPickDetails shipmentId={shipmentId} />
+        ) : null;
+    }
+  }
   };
 
   return (
