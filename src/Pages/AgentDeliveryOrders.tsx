@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
@@ -8,7 +8,10 @@ import { DROPDOWN_CONFIGS, STATUS_META } from "../components/orderDetails/Agento
 import { AgentOrderLocation } from "../components/orderDetails/Agentorderlocation";
 import { EmptyOrdersState } from "../components/orderDetails/EmptyState";
 import { AgentOrderTabs } from "../components/orderDetails/Agentordertabs";
+
 import { FiAlertCircle } from "react-icons/fi";
+import type { OrderStatus } from "../Types/AgentTypes";
+import { useAgentOrderCounts } from "../hooks/useAgentOrderCounts";
 
 const TABS = [
   { key: "all", label: "All Orders" },
@@ -29,113 +32,75 @@ const navigateTo = (path: string) => {
   window.dispatchEvent(new PopStateEvent("popstate"));
 };
 
+const STATUS_TABS = TABS.slice(1).map((t) => t.key as OrderStatus);
+
 const AgentDeliveryOrders = () => {
-  // const agentId = "6a6b29dbf447531ecb351110";
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
-const {
-  onStatusChange,
-  isUpdatingStatus,
-} = useAgentStatusChange(agentId);
- const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
-    const [currentPage, setCurrentPage] = useState(1);
+  const { onStatusChange, isUpdatingStatus } = useAgentStatusChange(agentId);
+  const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, isPending, isError } = useAgentOrders(agentId, currentPage);
-const orders = data?.orders ?? [];
-const meta = data?.meta;
-  const deliveryOrders = useMemo(
-    () =>
-      orders.filter((order) =>
-        TABS.slice(1).some((tab) => tab.key === order.orderStatus)
-      ),
-    [orders]
-  );
+  const currentStatus = activeTab === "all" ? undefined : (activeTab as OrderStatus);
 
-  const counts = useMemo(() => {
-    const result: Record<string, number> = { all: deliveryOrders.length };
-    deliveryOrders.forEach((order) => {
-      result[order.orderStatus] = (result[order.orderStatus] || 0) + 1;
-    });
-    return result;
-  }, [deliveryOrders]);
+  const { data, isPending, isError } = useAgentOrders(agentId, "Delivery", currentPage, currentStatus);
+  const orders = data?.orders ?? [];
+  const meta = data?.meta;
 
-  const filteredOrders = useMemo(() => {
-    if (activeTab === "all") return deliveryOrders;
-    return deliveryOrders.filter((order) => order.orderStatus === activeTab);
-  }, [activeTab, deliveryOrders]);
+  const counts = useAgentOrderCounts(agentId, "Delivery", STATUS_TABS);
 
-  if (isPending) {
-    return <Rb_LoadingSpinner />;
-  }
+  const handleTabChange = (tab: (typeof TABS)[number]["key"]) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  if (isPending) return <Rb_LoadingSpinner />;
 
   if (isError) {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-6">
+        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-  <FiAlertCircle className="text-3xl text-red-500" />
-</div>
+            <FiAlertCircle className="text-3xl text-red-500" />
+          </div>
+          <Rb_Text className="text-xl font-semibold text-gray-900">Oops! Something went wrong</Rb_Text>
+          <Rb_Text className="mt-2 text-sm text-gray-500">
+            We couldn't load your order details right now. Please try again in a few moments.
+          </Rb_Text>
+          <Rb_Button
+            onClick={() => window.location.reload()}
+            className="mt-6 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+          >
+            Try Again
+          </Rb_Button>
         </div>
-
-        <Rb_Text className="text-xl font-semibold text-gray-900">
-          Oops! Something went wrong
-        </Rb_Text>
-
-        <Rb_Text className="mt-2 text-sm text-gray-500">
-          We couldn't load your order details right now. Please try again in a
-          few moments.
-        </Rb_Text>
-
-        <Rb_Button
-          onClick={() => window.location.reload()}
-          className="mt-6 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-        >
-          Try Again
-        </Rb_Button>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
   return (
     <>
-     {isUpdatingStatus && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-        <div className="rounded-xl bg-white p-6 shadow-lg">
-          <Rb_LoadingSpinner />
-          <Rb_Text className="mt-3 text-sm text-gray-600">
-            Updating status...
-          </Rb_Text>
+      {isUpdatingStatus && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="rounded-xl bg-white p-6 shadow-lg">
+            <Rb_LoadingSpinner />
+            <Rb_Text className="mt-3 text-sm text-gray-600">Updating status...</Rb_Text>
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
-    <div className="w-full max-w-5xl px-4 py-6">
-      <div className="mb-6">
-        <h4 className="text-xl font-semibold text-gray-900">Delivered Orders</h4>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage and track your assigned Delivered orders
-        </p>
-      </div>
+      <div className="w-full max-w-5xl px-4 py-6">
+        <div className="mb-6">
+          <h4 className="text-xl font-semibold text-gray-900">Delivery Orders</h4>
+          <p className="mt-1 text-sm text-gray-500">Manage and track your assigned delivery orders</p>
+        </div>
 
-      {deliveryOrders.length > 0 && (
-          <AgentOrderTabs
-            tabs={TABS}
-            activeTab={activeTab}
-            counts={counts}
-            onChange={setActiveTab}
-          />
-        )}
+        <AgentOrderTabs tabs={TABS} activeTab={activeTab} counts={counts} onChange={handleTabChange} />
 
         <div className="space-y-3">
-          {filteredOrders.length === 0 ? (
-            <EmptyOrdersState
-              message={
-                EMPTY_STATE_COPY[activeTab] ??
-                "No orders in this category yet."
-              }
-            />
+          {orders.length === 0 ? (
+            <EmptyOrdersState message={EMPTY_STATE_COPY[activeTab] ?? "No orders in this category yet."} />
           ) : (
-            filteredOrders.map((order) => (
+            orders.map((order) => (
               <AgentOrderCard
                 key={order.orderId}
                 order={order}
@@ -145,29 +110,29 @@ const meta = data?.meta;
                     statusMeta={STATUS_META}
                     dropdownConfigs={DROPDOWN_CONFIGS}
                     onStatusChange={onStatusChange}
+                    disabled={isUpdatingStatus}
                   />
                 }
                 locationSlot={<AgentOrderLocation order={order} />}
-                onViewDetails={(o) =>
-                  navigateTo(`/agent-orders/${o.shipmentId}`)
-                }
+                // onViewDetails={(o) => navigateTo(`/agent-orders/${o.shipmentId}`)}
+                onViewDetails={(o) => navigateTo(`/agent/delivery-orders/${o.shipmentId}`)}
               />
             ))
           )}
         </div>
-          {deliveryOrders.length > 0 &&
-            meta &&
-            meta.totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={meta.totalPages}
-                  onPageChange={setCurrentPage}
-                />
-              </div>
-            )}
-        </div>
-        </>
+
+        {meta && meta.totalRecords > meta.limit && (
+          <div className="mt-6 flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={meta.totalPages}
+              onPageChange={setCurrentPage}
+              disabled={isPending}
+            />
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
