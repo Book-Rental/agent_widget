@@ -13,7 +13,7 @@ import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { Rb_Text } from "@rentbook/rentbook-ui-lib";
-// import StatusNoteCard from "../components/pickDetails/StatusNoteCard";
+import StatusNoteCard from "../components/pickDetails/StatusNoteCard";
 
 type AgentPickDetailsProps = {
   shipmentId: string;
@@ -202,7 +202,7 @@ const {
     </div>
   </div>
 )} */}
-    <div className="min-h-screen px-4 py-5">
+    <div className="min-h-screen px-4 py-5 mt-5">
       <div className="mx-auto max-w-7xl space-y-6">
        <PageHeader
   title={
@@ -224,7 +224,8 @@ const {
             <BookDetails item={order.items[0]} />
 
             {(showSellerDetails || showHubDetails || isHubToUser) && (
-              <div className="grid items-stretch gap-6 md:grid-cols-2">
+              <>
+                <div className="grid items-stretch gap-6 md:grid-cols-2">
                 {showSellerDetails && seller && (
                   <>
                     <ContactCard
@@ -285,7 +286,12 @@ const {
                     )}
                   </>
                 )}
+                
               </div>
+              <div className="h-full">
+  <StatusNoteCard status={currentStatus} />
+</div>
+              </>
             )}
           </div>
 
