@@ -33,10 +33,9 @@ const StatusNoteCard = ({ status }: StatusNoteCardProps) => {
   const note = STATUS_NOTES[status];
 
   if (!note) return null;
-return (
-  <div className="min-h-[160px] rounded-2xl border border-blue-100 bg-blue-50 p-5 shadow-sm">
-    <div className="flex h-full items-start gap-4">
 
+  return (
+    <div className="flex items-start gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-5">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
         <FiInfo className="text-blue-600" />
       </div>
@@ -46,14 +45,12 @@ return (
           Note
         </Rb_Text>
 
-        <Rb_Text className="mt-3 text-sm leading-5 text-gray-700">
+        <Rb_Text className="mt-2 text-sm leading-6 text-gray-700">
           {note}
         </Rb_Text>
       </div>
-
     </div>
-  </div>
-);
+  );
 };
 
 export default StatusNoteCard;
