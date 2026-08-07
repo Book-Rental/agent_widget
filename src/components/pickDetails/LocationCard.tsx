@@ -20,10 +20,11 @@ export function LocationCard({
   zipCode,
   onMap,
 }: Props) {
-  return (
-    <div className="w-full rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+return (
+  <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="flex-1">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-6 flex items-start justify-between">
         <div>
           <Rb_Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             {title}
@@ -56,15 +57,15 @@ export function LocationCard({
           </Rb_Text>
         )}
       </div>
-
-      {/* Action */}
-      <button
-        onClick={onMap}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-50 py-3 text-sm font-medium text-violet-600 transition hover:bg-violet-100"
-      >
-        <FiNavigation size={16} />
-        Open in Maps
-      </button>
     </div>
-  );
+
+    <button
+      onClick={onMap}
+      className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-violet-50 text-sm font-medium text-violet-600 hover:bg-violet-100"
+    >
+      <FiNavigation size={16} />
+      Open in Maps
+    </button>
+  </div>
+);
 }
