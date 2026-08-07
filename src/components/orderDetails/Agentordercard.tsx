@@ -11,6 +11,7 @@ type AgentOrderCardProps = {
   statusSlot: ReactNode;
   locationSlot?: ReactNode;
   onViewDetails: (order: AgentOrder) => void;
+  selectionSlot?: ReactNode;
 };
 
 export const AgentOrderCard = ({
@@ -18,12 +19,16 @@ export const AgentOrderCard = ({
   statusSlot,
   locationSlot,
   onViewDetails,
+  selectionSlot,
 }: AgentOrderCardProps) => {
   const item = order.items?.[0] ?? null;
 
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex gap-3">
+        {selectionSlot && (
+          <div className="flex items-center">{selectionSlot}</div>
+        )}
         <Rb_Image
           src={item?.coverImage || "/images/book-placeholder.png"}
           alt={item?.bookName || "Book cover"}

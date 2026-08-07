@@ -1,5 +1,7 @@
+
+//adding modal
 import { useState } from "react";
-import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
+import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text, Checkbox } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
 import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
@@ -8,10 +10,10 @@ import { DROPDOWN_CONFIGS, STATUS_META } from "../components/orderDetails/Agento
 import { AgentOrderLocation } from "../components/orderDetails/Agentorderlocation";
 import { EmptyOrdersState } from "../components/orderDetails/EmptyState";
 import { AgentOrderTabs } from "../components/orderDetails/Agentordertabs";
-
 import { FiAlertCircle } from "react-icons/fi";
 import type { OrderStatus } from "../Types/AgentTypes";
 import { useAgentOrderCounts } from "../hooks/useAgentOrderCounts";
+import { DeliveryConfirmationModal } from "../components/orderDetails/DeliveryConfirmationModal";
 
 const TABS = [
   { key: "all", label: "All Orders" },
@@ -33,24 +35,64 @@ const navigateTo = (path: string) => {
 };
 
 const STATUS_TABS = TABS.slice(1).map((t) => t.key as OrderStatus);
+const SELECTABLE_STATUS: OrderStatus = "Delivery Agent Assigned";
 
 const AgentDeliveryOrders = () => {
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
   const { onStatusChange, isUpdatingStatus } = useAgentStatusChange(agentId);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]["key"]>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmAction, setConfirmAction] = useState<"accept" | "reject" | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  console.log(isProcessing)
 
   const currentStatus = activeTab === "all" ? undefined : (activeTab as OrderStatus);
 
   const { data, isPending, isError } = useAgentOrders(agentId, "Delivery", currentPage, currentStatus);
   const orders = data?.orders ?? [];
   const meta = data?.meta;
+  
 
   const counts = useAgentOrderCounts(agentId, "Delivery", STATUS_TABS);
 
   const handleTabChange = (tab: (typeof TABS)[number]["key"]) => {
     setActiveTab(tab);
     setCurrentPage(1);
+  };
+
+  const toggleSelect = (shipmentId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(shipmentId)) next.delete(shipmentId);
+      else next.add(shipmentId);
+      return next;
+    });
+  };
+
+  const selectedOrders = orders.filter(
+    (o) => o.shipmentId && selectedIds.has(o.shipmentId)
+  );
+  const hasSelection = selectedOrders.length > 0;
+
+  const handleConfirm = async () => {
+    if (!confirmAction) return;
+    setIsProcessing(true);
+    try {
+      const newStatus: OrderStatus =
+        confirmAction === "accept" ? "Out For Delivery" : "Delivery Failed";
+
+      await Promise.all(
+        selectedOrders
+          .filter((o): o is typeof o & { shipmentId: string } => !!o.shipmentId)
+    .map((o) => onStatusChange(o, newStatus))
+      );
+
+      setSelectedIds(new Set());
+      setConfirmAction(null);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (isPending) return <Rb_LoadingSpinner />;
@@ -94,7 +136,33 @@ const AgentDeliveryOrders = () => {
           <p className="mt-1 text-sm text-gray-500">Manage and track your assigned delivery orders</p>
         </div>
 
-        <AgentOrderTabs tabs={TABS} activeTab={activeTab} counts={counts} onChange={handleTabChange} />
+        <div className="mb-6 flex flex-wrap items-stretch justify-between gap-3">
+          <AgentOrderTabs tabs={TABS} activeTab={activeTab} counts={counts} onChange={handleTabChange} />
+
+          <div className="flex items-stretch gap-2">
+             <Rb_Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!hasSelection}
+                onClick={() => setConfirmAction("reject")}
+                className="!h-9 !px-3 !py-0 !text-xs sm:!text-sm !border-red-200 !text-red-600 hover:!bg-red-50"
+              >
+                Reject{hasSelection ? ` (${selectedOrders.length})` : ""}
+              </Rb_Button>
+
+              <Rb_Button
+                type="button"
+                variant="primary"
+                size="sm"
+                disabled={!hasSelection}
+                onClick={() => setConfirmAction("accept")}
+                className="!h-9 !px-3 !py-0 !text-xs sm:!text-sm"
+              >
+                Accept{hasSelection ? ` (${selectedOrders.length})` : ""}
+              </Rb_Button>
+          </div>
+        </div>
 
         <div className="space-y-3">
           {orders.length === 0 ? (
@@ -104,6 +172,15 @@ const AgentDeliveryOrders = () => {
               <AgentOrderCard
                 key={order.orderId}
                 order={order}
+                selectionSlot={
+                  order.shipmentId && order.orderStatus === SELECTABLE_STATUS ? (
+                    <Checkbox
+                      checked={selectedIds.has(order.shipmentId)}
+                      onChange={() => toggleSelect(order.shipmentId!)}
+                      disabled={isUpdatingStatus}
+                    />
+                  ) : null
+                }
                 statusSlot={
                   <OrderStatusControl
                     order={order}
@@ -132,6 +209,13 @@ const AgentDeliveryOrders = () => {
           </div>
         )}
       </div>
+      <DeliveryConfirmationModal
+        isOpen={confirmAction !== null}
+        action={confirmAction ?? "accept"}
+        selectedCount={selectedOrders.length}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleConfirm}
+      />
     </>
   );
 };

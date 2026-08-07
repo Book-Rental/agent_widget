@@ -37,8 +37,8 @@ export function AgentOrderTabs<TKey extends string>({
           aria-selected={isActive}
           onClick={() => onChange(tab.key)}
           className={`
-            inline-flex min-w-fit items-center justify-center gap-2
-            rounded-full px-3 py-2
+            inline-flex h-9 min-w-fit items-center justify-center gap-2
+            rounded-full px-3 py-0
             text-xs sm:text-sm
             font-medium whitespace-nowrap
             ${
