@@ -21,17 +21,20 @@ export default function ContactCard({
     .slice(0, 2)
     .toUpperCase();
 
-  return (
-    <div className="w-full rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+ return (
+  <div className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="flex-1">
       {/* Header */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
-          <FiUser size={18} className="text-violet-500" />
-        </div>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
+            <FiUser className="text-violet-500" />
+          </div>
 
-        <Rb_Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          {title}
-        </Rb_Text>
+          <Rb_Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            {title}
+          </Rb_Text>
+        </div>
       </div>
 
       {/* Contact */}
@@ -47,7 +50,7 @@ export default function ContactCard({
             </Rb_Text>
 
             {phone && (
-              <Rb_Text className="mt-1 text-sm font-normal text-slate-500">
+              <Rb_Text className="mt-1 text-sm text-slate-500">
                 +91 {phone}
               </Rb_Text>
             )}
@@ -57,22 +60,23 @@ export default function ContactCard({
         {phone && (
           <button
             onClick={onCall}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-500 text-white transition hover:bg-violet-600"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-500 text-white hover:bg-violet-600"
           >
             <FiPhone size={18} />
           </button>
         )}
       </div>
-
-      {phone && (
-        <button
-          onClick={onCall}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-50 py-3 text-sm font-medium text-violet-600 transition hover:bg-violet-100"
-        >
-          <FiPhone size={16} />
-          Call Contact
-        </button>
-      )}
     </div>
-  );
+
+    {phone && (
+      <button
+        onClick={onCall}
+        className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-violet-50 text-sm font-medium text-violet-600 hover:bg-violet-100"
+      >
+        <FiPhone size={16} />
+        Call Contact
+      </button>
+    )}
+  </div>
+);
 }
