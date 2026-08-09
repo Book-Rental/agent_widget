@@ -1,89 +1,104 @@
-import { FiCheckCircle, FiCircle } from "react-icons/fi";
-import { Rb_Text } from "@rentbook/rentbook-ui-lib";
-import { formatDate } from "../../utils/formatDate";
+import { FiCheckCircle } from "react-icons/fi";
+import type { OrderStatus } from "../../Types/AgentTypes";
 
-export type TimelineItem = {
+type TimelineItem = {
   label: string;
   date?: string;
   description?: string;
 };
 
-type ProgressTimelineProps = {
+type Props = {
   timeline: TimelineItem[];
+  currentStatus: OrderStatus;
 };
 
-const ProgressTimeline = ({ timeline }: ProgressTimelineProps) => {
-  const completedCount = timeline.filter((t) => t.date).length;
+const ProgressTimeline = ({
+  timeline,
+  currentStatus,
+}: Props) => {
+  const currentIndex = timeline.findIndex(
+    (item) => item.label === currentStatus
+  );
+
+  const completedCount =
+    currentIndex >= 0 ? currentIndex + 1 : 0;
 
   return (
-    // Now matches StatusNoteCard: rounded-2xl border bg-white shadow-sm p-5
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <Rb_Text className="text-sm font-semibold text-gray-900">
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-900">
           Progress
-        </Rb_Text>
-        <Rb_Text className="text-xs font-medium text-gray-400">
+        </h3>
+
+        <span className="text-sm font-semibold text-gray-400">
           {completedCount}/{timeline.length} completed
-        </Rb_Text>
+        </span>
       </div>
 
-      {timeline.map((step, index) => {
-        const completed = Boolean(step.date);
-        const isNext = !completed && index === completedCount;
-        const isLast = index === timeline.length - 1;
+      <div>
+        {timeline.map((item, index) => {
+          const isCompleted =
+            index <= currentIndex;
 
-        return (
-          <div key={step.label} className="relative flex gap-4">
-            {!isLast && (
-              <div
-                className={`absolute left-[9px] top-5 h-full w-px transition-colors duration-500 ${
-                  completed ? "bg-blue-400" : "bg-gray-200"
-                }`}
-              />
-            )}
+          const isLast =
+            index === timeline.length - 1;
 
+          return (
             <div
-              className={`relative z-0 flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors duration-300 ${
-                completed
-                  ? "bg-blue-500"
-                  : isNext
-                    ? "bg-white ring-2 ring-blue-300"
-                    : "bg-gray-200"
-              }`}
+              key={item.label}
+              className="relative flex gap-4"
             >
-              {completed ? (
-                <FiCheckCircle className="h-3.5 w-3.5 text-white" />
-              ) : isNext ? (
-                <FiCircle className="h-2 w-2 fill-blue-400 text-blue-400" />
-              ) : null}
-            </div>
-
-            <div className="pb-6">
-              <Rb_Text
-                className={
-                  completed
-                    ? "text-sm font-semibold text-gray-900"
-                    : isNext
-                      ? "text-sm font-semibold text-blue-600"
-                      : "text-sm font-semibold text-gray-400"
-                }
-              >
-                {step.label}
-              </Rb_Text>
-
-              <Rb_Text className="mt-1 text-xs text-gray-500">
-                {step.date ? formatDate(step.date) : isNext ? "Up next" : "Pending"}
-              </Rb_Text>
-
-              {step.description && (
-                <Rb_Text className="mt-1 text-xs font-medium text-sky-600">
-                  {step.description}
-                </Rb_Text>
+              {!isLast && (
+                <div
+                  className={`absolute left-[11px] top-6 h-full w-0.5 ${
+                    index < currentIndex
+                      ? "bg-blue-500"
+                      : "bg-gray-200"
+                  }`}
+                />
               )}
+
+              <div className="relative z-10 shrink-0">
+                <div
+                  className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                    isCompleted
+                      ? "border-blue-500 bg-blue-500 text-white"
+                      : "border-gray-300 bg-white text-gray-300"
+                  }`}
+                >
+                  {isCompleted && (
+                    <FiCheckCircle size={16} />
+                  )}
+                </div>
+              </div>
+
+              <div
+                className={`pb-8 ${
+                  isLast ? "pb-0" : ""
+                }`}
+              >
+                <p className="text-sm font-semibold text-gray-900">
+                  {item.label}
+                </p>
+
+                {item.date && (
+                  <p className="mt-1 text-xs text-gray-400">
+                    {new Date(
+                      item.date
+                    ).toLocaleString()}
+                  </p>
+                )}
+
+                {item.description && (
+                  <p className="mt-2 text-sm font-medium text-sky-600">
+                    {item.description}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -38,7 +38,6 @@ export type ShipmentType =
   | "Return"
   | "Exchange";
 
-
 export type DeliveryType =
   | "SELLER_TO_HUB"
   | "USER_RETURN_TO_HUB"
@@ -72,17 +71,22 @@ export type HubDetails = {
   address: string;
   city: string;
   state: string;
+  pincode: string;
+  country?: string;
+  phoneNumber?: string;
+  hubCode?: string;
   distance?: string;
   location?: Location;
+
   receivedBy?: {
     adminId: string;
     name: string;
     phoneNumber?: string;
   };
+
   receivedDate?: string;
   receivedImages?: string[];
   verificationStatus?: string;
-  pincode: string
 };
 
 export type PickupVerification = {
@@ -99,13 +103,31 @@ export type DeliveryVerification = {
   images: string[];
 };
 
+export type JourneyHistory = {
+  event: string;
+  status: OrderStatus;
+  eventAt: string;
+  remarks?: string;
+  hubId?: string | null;
+  tripId?: string | null;
+  agentId?: string | null;
+  updatedBy?: string | null;
+};
+
 export type AgentOrder = {
+  shipmentId: string;
+
+  awbNumber: string;
+
   orderId: string;
   orderNumber: string;
   orderDate: string;
-   shipmentType: ShipmentType;
-  // Frontend agent flow
+
+  shipmentType: ShipmentType;
   deliveryType: DeliveryType;
+
+  orderStatus: OrderStatus;
+
   assignedDate?: string;
   pickupStartedDate?: string;
   pickupDate?: string;
@@ -114,56 +136,147 @@ export type AgentOrder = {
   completedDate?: string;
   deliveryStartedDate?: string;
   deliveredDate?: string;
-  orderStatus: OrderStatus;
-  items: OrderItem[];
-  sellerDetails?: SellerDetails;
-  hubDetails?: HubDetails;
-  userDetails?: UserDetails;
-  pickupVerification?: PickupVerification;
-  deliveryVerification?: DeliveryVerification;
-  journeyHistory: JourneyHistory[];
-  shipmentId?: string
-};
 
-export type JourneyHistory = {
-  event: string;
-  status: OrderStatus;
-  eventAt: string;
-  remarks?: string;
+  items: OrderItem[];
+
+  sellerDetails?: SellerDetails;
+
+  hubDetails?: HubDetails;
+
+  destinationHubDetails?: HubDetails;
+
+  userDetails?: UserDetails;
+
+  pickupVerification?: PickupVerification;
+
+  deliveryVerification?: DeliveryVerification;
+
+  journeyHistory: JourneyHistory[];
 };
 
 export type ShipmentApi = {
-  _id: string;
+  shipmentId: string;
+  _id?: string;
+
   awbNumber: string;
-  currentStatus: string;
-  createdAt: string;
+
+  orderId: string;
+  orderItemId?: string;
 
   sellerId: string;
+  buyerId?: string;
+
+  shipmentType: ShipmentType;
+
+  paymentMode?: string;
+  codAmount?: number;
+
+  currentStatus: string;
+
+  expectedDeliveryDate?: string;
+
+  createdAt: string;
+  updatedAt?: string;
 
   sender: {
     name: string;
     phone: string;
+    email?: string;
+
     addressLine1: string;
+    addressLine2?: string;
+
     city: string;
     state: string;
     pincode: string;
     country: string;
+
+    location?: Location;
+  };
+
+  receiver: {
+    name: string;
+    phone: string;
+
+    addressLine1: string;
+    addressLine2?: string;
+
+    city: string;
+    state: string;
+    pincode: string;
+    country: string;
+
+    location?: Location;
+  };
+
+  infrastructure: {
+    originHub: {
+      _id: string;
+      hubCode: string;
+      hubName: string;
+      phoneNumber?: string;
+
+      address: {
+        street: string;
+        city: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+    };
+
+    destinationHub: {
+      _id: string;
+      hubCode: string;
+      hubName: string;
+      phoneNumber?: string;
+
+      address: {
+        street: string;
+        city: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+    };
+
+    currentHub?: {
+      _id: string;
+      hubCode?: string;
+      hubName?: string;
+
+      address?: {
+        street: string;
+        city: string;
+        state: string;
+        country: string;
+        pincode: string;
+      };
+    };
+  };
+
+  agentIds?: string[];
+
+  assignedAgent?: {
+    _id: string;
+    fullName: string;
+    phoneNumber: string;
+    vehicleType?: string;
+    status?: string;
   };
 
   orderDetails: {
+    orderId: string;
+
     orderItem: {
+      orderItemId?: string;
       bookId: string;
       bookName: string;
       author: string;
       coverImage: string;
       quantity: number;
+      itemStatus?: string;
     };
-  };
-
-  originHubId: {
-    _id: string;
-    hubName: string;
-    hubCode: string;
   };
 
   journeyHistory: JourneyHistory[];

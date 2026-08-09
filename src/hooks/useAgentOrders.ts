@@ -9,8 +9,23 @@ export const useAgentOrders = (
   currentStatus?: OrderStatus
 ) => {
   return useQuery({
-    queryKey: ["agent-orders", agentId, journeyType, page, currentStatus ?? "all"],
-    queryFn: () => getAgentOrders(agentId, journeyType, page, 10, currentStatus),
+    queryKey: [
+      "agent-orders",
+      agentId,
+      journeyType,
+      page,
+      currentStatus ?? "all",
+    ],
+
+    queryFn: () =>
+      getAgentOrders(
+        agentId,
+        journeyType,
+        page,
+        10,
+        currentStatus
+      ),
+
     enabled: !!agentId,
   });
 };

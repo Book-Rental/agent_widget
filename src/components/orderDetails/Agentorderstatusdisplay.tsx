@@ -70,17 +70,17 @@ export const DROPDOWN_CONFIGS: StatusDropdownConfig[] = [
     ],
   },
 
-  {
-    triggerStatus: "Delivery Agent Assigned",
-    options: [
-      {
-        label: "Delivery Assigned",
-        value: "Delivery Agent Assigned",
-      },
-      {
-        label: "Out For Delivery",
-        value: "Out For Delivery",
-      },
-    ],
-  },
+  // {
+  //   triggerStatus: "Delivery Agent Assigned",
+  //   options: [
+  //     {
+  //       label: "Delivery Assigned",
+  //       value: "Delivery Agent Assigned",
+  //     },
+  //     {
+  //       label: "Out For Delivery",
+  //       value: "Out For Delivery",
+  //     },
+  //   ],
+  // },
 ];

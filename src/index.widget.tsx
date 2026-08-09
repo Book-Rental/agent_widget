@@ -6,7 +6,7 @@ export interface AgentWidgetOptions {
   containerElementId: string;
   module: "pickup" | "delivery";
   view: | "orders" | "details" | "verification" | "confirmation";
-  shipmentId?: string; 
+  // shipmentId?: string; 
 }
 
 declare global {
@@ -41,7 +41,7 @@ window.renderReactWidget = (config: string) => {
   const root = createRoot(container);
 
   root.render(
-    <App module={options.module} view={options.view} shipmentId={options.shipmentId}/>
+    <App module={options.module} view={options.view} />
   );
 
   roots[options.containerElementId] = root;

@@ -14,13 +14,10 @@ import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
 import { FiAlertCircle } from "react-icons/fi";
 
-interface PickupVerificationProps {
-  shipmentId: string;
-}
 
-const PickupVerification = ({
-  shipmentId,
-}: PickupVerificationProps) => {
+const PickupVerification = () => {
+  const params = new URLSearchParams(window.location.search);
+  const shipmentId = params.get("shipmentId") ?? "";
   const [photosComplete, setPhotosComplete] = useState(false);
   const [conditionSelected, setConditionSelected] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
