@@ -7,7 +7,7 @@ interface PickupSuccessProps {
   // bookName: string;
   // pickedUpFrom: string;
   // dateTime: string;
-  shipmentId: string;
+  // shipmentId: string;
   onViewOrderDetails: () => void;
   onBackToOrders: () => void;
 }
@@ -30,10 +30,12 @@ const CONFETTI = [
 ] as const;
 
 const PickupSuccess = ({
-  shipmentId,
   onViewOrderDetails,
   onBackToOrders,
 }: PickupSuccessProps) => {
+
+const params = new URLSearchParams(window.location.search);
+  const shipmentId = params.get("shipmentId") ?? "";
   const { data, isLoading, isError, } = useShipment(shipmentId);
   const shipment = data?.data;
 
