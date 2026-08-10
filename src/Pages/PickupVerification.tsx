@@ -16,9 +16,11 @@ import { FiAlertCircle } from "react-icons/fi";
 
 
 const PickupVerification = () => {
-  const params = new URLSearchParams(window.location.search);
-  const shipmentId = params.get("shipmentId") ?? "";
-  const [photosComplete, setPhotosComplete] = useState(false);
+    const pathname = window.location.pathname;
+
+ const pathParts = pathname.split("/").filter(Boolean); // /agent/pickup-orders/:shipmentId/pickup-verification 
+   const shipmentId = pathParts[2] ?? ""; 
+    const [photosComplete, setPhotosComplete] = useState(false);
   const [conditionSelected, setConditionSelected] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -97,7 +99,7 @@ const PickupVerification = () => {
       window.history.pushState(
         {},
         "",
-        `/agent/pickup-orders/${shipment.shipmentId}/confirmation`
+        `/agent/pickup-orders/${shipmentId}/confirmation`
       );
 
       window.dispatchEvent(new PopStateEvent("popstate"));
