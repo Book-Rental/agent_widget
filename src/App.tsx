@@ -63,12 +63,9 @@ function App({ module, view }: AppProps) {
       return <PickupVerification />;
     }
 
-    if (pathname.includes("/pickup-confirmation")) {
+    if (pathname.includes("/confirmation")) {
       return (
         <PickupSuccess
-          onViewOrderDetails={() => {
-            navigateTo("/agent/pickup-orders");
-          }}
           onBackToOrders={() => {
             navigateTo("/agent/pickup-orders");
           }}

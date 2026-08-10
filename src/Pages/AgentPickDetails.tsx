@@ -88,7 +88,7 @@ const DetailsBlock = ({
 );
 
 const AgentPickDetails = () => {
-  const pathname = window.location.pathname;
+  const pathname = window.location.pathname; 
 
   const shipmentId = pathname.split("/").filter(Boolean).pop() ?? "";
 
