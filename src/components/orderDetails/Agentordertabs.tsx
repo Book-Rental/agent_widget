@@ -1,6 +1,6 @@
 import { Rb_Button } from "@rentbook/rentbook-ui-lib";
 
-export type OrderTab<TKey extends string = string> = {
+export type OrderTab<TKey extends string> = {
   key: TKey;
   label: string;
 };
@@ -8,7 +8,7 @@ export type OrderTab<TKey extends string = string> = {
 type AgentOrderTabsProps<TKey extends string> = {
   tabs: readonly OrderTab<TKey>[];
   activeTab: TKey;
-  counts: Record<string, number>;
+  counts: Partial<Record<TKey, number>>;
   onChange: (key: TKey) => void;
 };
 
@@ -19,10 +19,7 @@ export function AgentOrderTabs<TKey extends string>({
   onChange,
 }: AgentOrderTabsProps<TKey>) {
   return (
-    <div
-      className="flex flex-wrap gap-2"
-      role="tablist"
-    >
+    <div className="flex flex-wrap gap-2">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
         const count = counts[tab.key] ?? 0;
@@ -48,22 +45,23 @@ export function AgentOrderTabs<TKey extends string>({
           >
             <span>{tab.label}</span>
 
-            <span
-              className={`
-                rounded-full px-2 py-0.5
-                text-xs font-semibold
-                ${
-                  isActive
-                    ? "bg-white/20 text-white"
-                    : "bg-white text-gray-600"
-                }
-              `}
-            >
-              {count}
-            </span>
+           <span
+  className={`
+    rounded-full px-2 py-0.5
+    text-xs font-semibold
+    ${
+      isActive
+        ? "bg-white/20 text-white"
+        : "bg-white text-gray-600"
+    }
+  `}
+>
+  {count}
+</span>
           </Rb_Button>
         );
       })}
     </div>
   );
 }
+
