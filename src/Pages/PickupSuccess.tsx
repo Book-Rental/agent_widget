@@ -1,4 +1,4 @@
-import { Rb_Button, Rb_Text ,  Rb_LoadingSpinner} from "@rentbook/rentbook-ui-lib";
+import {  Rb_Text ,  Rb_LoadingSpinner} from "@rentbook/rentbook-ui-lib";
 import { useShipment } from "../hooks/useShipment";
 import { FiAlertCircle } from "react-icons/fi";
 
@@ -8,7 +8,7 @@ interface PickupSuccessProps {
   // pickedUpFrom: string;
   // dateTime: string;
   // shipmentId: string;
-  onViewOrderDetails: () => void;
+  // onViewOrderDetails: () => void
   onBackToOrders: () => void;
 }
 
@@ -30,13 +30,13 @@ const CONFETTI = [
 ] as const;
 
 const PickupSuccess = ({
-  onViewOrderDetails,
   onBackToOrders,
 }: PickupSuccessProps) => {
 
-const params = new URLSearchParams(window.location.search);
-  const shipmentId = params.get("shipmentId") ?? "";
-  const { data, isLoading, isError, } = useShipment(shipmentId);
+  const pathname = window.location.pathname;
+ const pathParts = pathname.split("/").filter(Boolean); // /agent/pickup-orders/:shipmentId/pickup-verification 
+   const shipmentId = pathParts[2] ?? ""; 
+     const { data, isLoading, isError, } = useShipment(shipmentId);
   const shipment = data?.data;
 
   if (isLoading) {
@@ -212,7 +212,7 @@ const params = new URLSearchParams(window.location.search);
 
       {/* Buttons */}
       <div className="mt-8">
-        <div className="mt-8 flex justify-center">
+        {/* <div className="mt-8 flex justify-center">
             <Rb_Button
                 variant="primary"
                 className="min-w-[220px]"
@@ -220,7 +220,7 @@ const params = new URLSearchParams(window.location.search);
             >
                 View Order Details
             </Rb_Button>
-        </div>
+        </div> */}
 
         <button
           onClick={onBackToOrders}
