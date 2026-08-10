@@ -1,4 +1,4 @@
-import { Rb_Button, Rb_Text ,  Rb_LoadingSpinner} from "@rentbook/rentbook-ui-lib";
+import {  Rb_Text ,  Rb_LoadingSpinner} from "@rentbook/rentbook-ui-lib";
 import { useShipment } from "../hooks/useShipment";
 import { FiAlertCircle } from "react-icons/fi";
 
@@ -8,7 +8,7 @@ interface PickupSuccessProps {
   // pickedUpFrom: string;
   // dateTime: string;
   // shipmentId: string;
-  // onViewOrderDetails: () => void;
+  // onViewOrderDetails: () => void
   onBackToOrders: () => void;
 }
 
