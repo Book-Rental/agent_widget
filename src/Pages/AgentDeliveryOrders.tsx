@@ -158,13 +158,13 @@ const tabCounts: Record<TabKey, number> = {
       selectedIds.has(order.shipmentId)
   );
 
-  const hasAssignedSelection =
-    selectedOrders.length > 0 &&
-    selectedOrders.every(
-      (order) =>
-        order.orderStatus ===
-        SELECTABLE_STATUS
-    );
+  // const hasAssignedSelection =
+  //   selectedOrders.length > 0 &&
+  //   selectedOrders.every(
+  //     (order) =>
+  //       order.orderStatus ===
+  //       SELECTABLE_STATUS
+  //   );
 
   const handleConfirm = async () => {
     if (!confirmAction) {
@@ -265,13 +265,14 @@ const tabCounts: Record<TabKey, number> = {
             counts={tabCounts}
             onChange={handleTabChange}
           />
-          {hasAssignedSelection && (
+
             <div className="flex items-stretch gap-2">
               <Rb_Button
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={
+                  selectedOrders.length === 0 ||
                   isProcessing ||
                   isUpdatingStatus
                 }
@@ -299,7 +300,6 @@ const tabCounts: Record<TabKey, number> = {
                 Accept ({selectedOrders.length})
               </Rb_Button>
             </div>
-          )}
 
 
         </div>
