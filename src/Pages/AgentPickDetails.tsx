@@ -1,20 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import type { OrderStatus } from "../Types/AgentTypes";
-
 import { useAgentOrderDetails } from "../hooks/useAgentOrderDetails";
 import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
-
 import { callPhone } from "../utils/phone";
 import { openMaps } from "../utils/openMaps";
-
 import PageHeader from "../components/pickDetails/PageHeader";
 import BookDetails from "../components/pickDetails/BookDetails";
 import ContactCard from "../components/pickDetails/ContactCard";
 import ProgressTimeline from "../components/pickDetails/ProgressTimeline";
 import ActionCard from "../components/pickDetails/ActionCard";
 import { LocationCard } from "../components/pickDetails/LocationCard";
-
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
+import { ConfirmationModal } from "../components/orderDetails/ConfirmationModal";
 
 import {
   Rb_Button,
@@ -102,8 +99,8 @@ const AgentPickDetails = () => {
     isRefetching,
   } = useAgentOrderDetails(shipmentId);
 
-  const [currentStatus, setCurrentStatus] =
-    useState<OrderStatus>("Ready For Pickup");
+  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("Ready For Pickup");
+  const [isDeliveryConfirmationOpen, setIsDeliveryConfirmationOpen] = useState(false);
 
   useEffect(() => {
     if (order) {
@@ -113,9 +110,7 @@ const AgentPickDetails = () => {
 
   const isDeliveryJourney = DELIVERY_STATUSES.includes(currentStatus);
   const isPickupJourney = !isDeliveryJourney;
-
   const pageTitle = isDeliveryJourney ? "Delivery Details" : "Pick Up Details";
-
   const seller = order?.sellerDetails;
   const originHub = order?.hubDetails;
   const destinationHub = order?.destinationHubDetails;
@@ -197,6 +192,11 @@ const AgentPickDetails = () => {
         },
       }
     );
+  };
+
+  const handleConfirmDelivery = () => {
+    setIsDeliveryConfirmationOpen(false);
+    handleStatusChange("Delivered");
   };
 
   const goToVerification = () => {
@@ -331,7 +331,7 @@ const AgentPickDetails = () => {
             status={currentStatus}
             onVerify={goToVerification}
             onSorting={() => handleStatusChange("Sorting Completed")}
-            onDelivered={() => handleStatusChange("Delivered")}
+            onDelivered={() => setIsDeliveryConfirmationOpen(true)}
           />
         </div>
       </div>
@@ -341,6 +341,14 @@ const AgentPickDetails = () => {
           <Rb_LoadingSpinner />
         </div>
       )}
+      <ConfirmationModal
+        isOpen={isDeliveryConfirmationOpen}
+        title="Mark Order as Delivered"
+        message="Are you sure you want to mark this order as delivered?"
+        confirmLabel="Mark Delivered"
+        onClose={() => setIsDeliveryConfirmationOpen(false)}
+        onConfirm={handleConfirmDelivery}
+      />
     </div>
   );
 };

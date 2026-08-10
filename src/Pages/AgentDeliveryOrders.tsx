@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Pagination,
-  Rb_Button,
-  Rb_LoadingSpinner,
-  Rb_Text,
-  Checkbox,
-} from "@rentbook/rentbook-ui-lib";
-
+import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text, Checkbox } from "@rentbook/rentbook-ui-lib";
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
 import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
@@ -14,9 +7,8 @@ import { STATUS_META } from "../components/orderDetails/Agentorderstatusdisplay"
 import { EmptyOrdersState } from "../components/orderDetails/EmptyState";
 import { AgentOrderTabs } from "../components/orderDetails/Agentordertabs";
 import { AgentOrderLocation } from "../components/orderDetails/Agentorderlocation";
-import { DeliveryConfirmationModal } from "../components/orderDetails/DeliveryConfirmationModal";
-
 import type { OrderStatus } from "../Types/AgentTypes";
+import { ConfirmationModal } from "../components/orderDetails/ConfirmationModal";
 
 const TABS = [
   { key: "all", label: "All Orders" },
@@ -328,10 +320,29 @@ const AgentDeliveryOrders = () => {
           )}
       </div>
 
-      <DeliveryConfirmationModal
+      <ConfirmationModal
         isOpen={confirmAction !== null}
-        action={confirmAction ?? "accept"}
-        selectedCount={selectedOrders.length}
+        title={
+          confirmAction === "accept"
+            ? "Accept Deliveries"
+            : "Reject Deliveries"
+        }
+        message={
+          confirmAction === "accept"
+            ? `Are you sure you want to accept ${
+                selectedOrders.length
+              } selected delivery order${
+                selectedOrders.length > 1 ? "s" : ""
+              }?`
+            : `Are you sure you want to reject ${
+                selectedOrders.length
+              } selected delivery order${
+                selectedOrders.length > 1 ? "s" : ""
+              }?`
+        }
+        confirmLabel={
+          confirmAction === "accept" ? "Accept" : "Reject"
+        }
         onClose={() => setConfirmAction(null)}
         onConfirm={handleConfirm}
       />
