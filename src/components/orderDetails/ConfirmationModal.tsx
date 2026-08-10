@@ -44,7 +44,7 @@ export function ConfirmationModal({
           Cancel
         </Rb_Button>
 
-        <Rb_Button variant="primary" onClick={onConfirm}>
+        <Rb_Button variant="primary" onClick={onConfirm} className="!border-red-600 !bg-red-600 !text-white hover:!bg-red-700">
           {confirmLabel}
         </Rb_Button>
       </ModalFooter>

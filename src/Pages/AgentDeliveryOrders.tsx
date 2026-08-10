@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Pagination, Rb_Button, Rb_LoadingSpinner, Rb_Text, Checkbox } from "@rentbook/rentbook-ui-lib";
+import {
+  Pagination,
+  Rb_Button,
+  Rb_LoadingSpinner,
+  Rb_Text,
+  Checkbox,
+} from "@rentbook/rentbook-ui-lib";
+
 import { useAgentOrders } from "../hooks/useAgentOrders";
 import { useAgentStatusChange } from "../hooks/Useagentstatuschange";
 import { AgentOrderCard } from "../components/orderDetails/Agentordercard";
@@ -11,7 +18,10 @@ import type { OrderStatus } from "../Types/AgentTypes";
 import { ConfirmationModal } from "../components/orderDetails/ConfirmationModal";
 
 const TABS = [
-  { key: "all", label: "All Orders" },
+  {
+    key: "all",
+    label: "All Orders",
+  },
   {
     key: "Delivery Agent Assigned",
     label: "Delivery Assigned",
@@ -48,20 +58,28 @@ const navigateTo = (path: string) => {
 const AgentDeliveryOrders = () => {
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
 
-  const [activeTab, setActiveTab] = useState<TabKey>("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    new Set()
-  );
+  const [activeTab, setActiveTab] =
+    useState<TabKey>("all");
 
-  const [confirmAction, setConfirmAction] = useState<
-    "accept" | "reject" | null
-  >(null);
+  const [currentPage, setCurrentPage] =
+    useState(1);
 
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedIds, setSelectedIds] =
+    useState<Set<string>>(new Set());
 
-  const { onStatusChange, isUpdatingStatus } =
-    useAgentStatusChange(agentId);
+  // const [tabCounts, setTabCounts] =
+  //   useState<Partial<Record<TabKey, number>>>({});
+
+  const [confirmAction, setConfirmAction] =
+    useState<"accept" | "reject" | null>(null);
+
+  const [isProcessing, setIsProcessing] =
+    useState(false);
+
+  const {
+    onStatusChange,
+    isUpdatingStatus,
+  } = useAgentStatusChange(agentId);
 
   const currentStatus: OrderStatus | undefined =
     activeTab === "all"
@@ -81,13 +99,39 @@ const AgentDeliveryOrders = () => {
 
   const orders = data?.orders ?? [];
   const meta = data?.meta;
+const counts = data?.counts;
 
-  const counts: Record<string, number> = {
-    [activeTab]: meta?.totalRecords ?? 0,
-  };
+  // useEffect(() => {
+  //   if (!meta) {
+  //     return;
+  //   }
 
+  //   setTabCounts((previous) => {
+  //     if (
+  //       previous[activeTab] ===
+  //       meta.totalRecords
+  //     ) {
+  //       return previous;
+  //     }
+
+  //     return {
+  //       ...previous,
+  //       [activeTab]: meta.totalRecords,
+  //     };
+  //   });
+  // }, [meta, activeTab]);
+const tabCounts: Record<TabKey, number> = {
+  all: counts?.totalCount ?? 0,
+  "Delivery Agent Assigned":
+    counts?.["Delivery Agent Assigned"] ?? 0,
+  "Out For Delivery":
+    counts?.["Out For Delivery"] ?? 0,
+  Delivered: counts?.Delivered ?? 0,
+};
   const handleTabChange = (tab: TabKey) => {
-    if (tab === activeTab) return;
+    if (tab === activeTab) {
+      return;
+    }
 
     setActiveTab(tab);
     setCurrentPage(1);
@@ -95,8 +139,8 @@ const AgentDeliveryOrders = () => {
   };
 
   const toggleSelect = (shipmentId: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
+    setSelectedIds((previous) => {
+      const next = new Set(previous);
 
       if (next.has(shipmentId)) {
         next.delete(shipmentId);
@@ -110,14 +154,22 @@ const AgentDeliveryOrders = () => {
 
   const selectedOrders = orders.filter(
     (order) =>
-      order.shipmentId &&
+      !!order.shipmentId &&
       selectedIds.has(order.shipmentId)
   );
 
-  const hasSelection = selectedOrders.length > 0;
+  const hasAssignedSelection =
+    selectedOrders.length > 0 &&
+    selectedOrders.every(
+      (order) =>
+        order.orderStatus ===
+        SELECTABLE_STATUS
+    );
 
   const handleConfirm = async () => {
-    if (!confirmAction) return;
+    if (!confirmAction) {
+      return;
+    }
 
     setIsProcessing(true);
 
@@ -137,7 +189,10 @@ const AgentDeliveryOrders = () => {
             } => !!order.shipmentId
           )
           .map((order) =>
-            onStatusChange(order, newStatus)
+            onStatusChange(
+              order,
+              newStatus
+            )
           )
       );
 
@@ -154,7 +209,7 @@ const AgentDeliveryOrders = () => {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
+      <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
         <Rb_Text className="text-xl font-semibold text-gray-900">
           Oops! Something went wrong
         </Rb_Text>
@@ -165,7 +220,9 @@ const AgentDeliveryOrders = () => {
         </Rb_Text>
 
         <Rb_Button
-          onClick={() => window.location.reload()}
+          onClick={() =>
+            window.location.reload()
+          }
           className="mt-6 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white"
         >
           Try Again
@@ -205,37 +262,46 @@ const AgentDeliveryOrders = () => {
           <AgentOrderTabs
             tabs={TABS}
             activeTab={activeTab}
-            counts={counts}
+            counts={tabCounts}
             onChange={handleTabChange}
           />
+          {hasAssignedSelection && (
+            <div className="flex items-stretch gap-2">
+              <Rb_Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={
+                  isProcessing ||
+                  isUpdatingStatus
+                }
+                onClick={() =>
+                  setConfirmAction("reject")
+                }
+                className="!h-9 !border-red-200 !px-3 !py-0 !text-xs !text-red-600 hover:!bg-red-50 sm:!text-sm"
+              >
+                Reject ({selectedOrders.length})
+              </Rb_Button>
 
-          <div className="flex items-stretch gap-2">
-            <Rb_Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={!hasSelection || isProcessing}
-              onClick={() => setConfirmAction("reject")}
-              className="!h-9 !border-red-200 !px-3 !py-0 !text-xs !text-red-600 hover:!bg-red-50 sm:!text-sm"
-            >
-              Reject
-              {hasSelection &&
-                ` (${selectedOrders.length})`}
-            </Rb_Button>
+              <Rb_Button
+                type="button"
+                variant="primary"
+                size="sm"
+                disabled={
+                  isProcessing ||
+                  isUpdatingStatus
+                }
+                onClick={() =>
+                  setConfirmAction("accept")
+                }
+                className="!h-9 !px-3 !py-0 !text-xs sm:!text-sm"
+              >
+                Accept ({selectedOrders.length})
+              </Rb_Button>
+            </div>
+          )}
 
-            <Rb_Button
-              type="button"
-              variant="primary"
-              size="sm"
-              disabled={!hasSelection || isProcessing}
-              onClick={() => setConfirmAction("accept")}
-              className="!h-9 !px-3 !py-0 !text-xs sm:!text-sm"
-            >
-              Accept
-              {hasSelection &&
-                ` (${selectedOrders.length})`}
-            </Rb_Button>
-          </div>
+
         </div>
 
         {/* Orders */}
@@ -249,23 +315,32 @@ const AgentDeliveryOrders = () => {
             />
           ) : (
             orders.map((order) => {
-              const meta = STATUS_META[order.orderStatus];
+              const statusMeta =
+                STATUS_META[
+                order.orderStatus
+                ];
+
+              const shipmentId =
+                order.shipmentId;
+
+              if (!shipmentId) {
+                return null;
+              }
 
               return (
                 <AgentOrderCard
-                  key={order.orderId}
+                  key={shipmentId}
                   order={order}
                   selectionSlot={
-                    order.shipmentId &&
                     order.orderStatus ===
                       SELECTABLE_STATUS ? (
                       <Checkbox
                         checked={selectedIds.has(
-                          order.shipmentId
+                          shipmentId
                         )}
                         onChange={() =>
                           toggleSelect(
-                            order.shipmentId!
+                            shipmentId
                           )
                         }
                         disabled={
@@ -276,15 +351,15 @@ const AgentDeliveryOrders = () => {
                     ) : null
                   }
                   statusSlot={
-                    meta ? (
+                    statusMeta ? (
                       <span
-                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${meta.badge}`}
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${statusMeta.badge}`}
                       >
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${meta.dot}`}
+                          className={`h-1.5 w-1.5 rounded-full ${statusMeta.dot}`}
                         />
 
-                        {meta.label}
+                        {statusMeta.label}
                       </span>
                     ) : (
                       <span className="text-xs text-gray-500">
@@ -293,11 +368,13 @@ const AgentDeliveryOrders = () => {
                     )
                   }
                   locationSlot={
-                    <AgentOrderLocation order={order} />
+                    <AgentOrderLocation
+                      order={order}
+                    />
                   }
-                  onViewDetails={(order) =>
+                  onViewDetails={() =>
                     navigateTo(
-                      `/agent/delivery-orders/${order.shipmentId}`
+                      `/agent/delivery-orders/${shipmentId}`
                     )
                   }
                 />
@@ -306,18 +383,16 @@ const AgentDeliveryOrders = () => {
           )}
         </div>
 
-        {/* Pagination */}
-        {meta &&
-          meta.totalRecords > meta.limit && (
-            <div className="mt-6 flex justify-center">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={meta.totalPages}
-                onPageChange={setCurrentPage}
-                disabled={isPending}
-              />
-            </div>
-          )}
+        {meta && meta.totalPages > 1 && (
+          <div className="mt-6 flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={meta.totalPages}
+              onPageChange={setCurrentPage}
+              disabled={isPending}
+            />
+          </div>
+        )}
       </div>
 
       <ConfirmationModal
@@ -329,21 +404,19 @@ const AgentDeliveryOrders = () => {
         }
         message={
           confirmAction === "accept"
-            ? `Are you sure you want to accept ${
-                selectedOrders.length
-              } selected delivery order${
-                selectedOrders.length > 1 ? "s" : ""
-              }?`
-            : `Are you sure you want to reject ${
-                selectedOrders.length
-              } selected delivery order${
-                selectedOrders.length > 1 ? "s" : ""
-              }?`
+            ? `Are you sure you want to accept ${selectedOrders.length
+            } selected delivery order${selectedOrders.length > 1 ? "s" : ""
+            }?`
+            : `Are you sure you want to reject ${selectedOrders.length
+            } selected delivery order${selectedOrders.length > 1 ? "s" : ""
+            }?`
         }
         confirmLabel={
           confirmAction === "accept" ? "Accept" : "Reject"
         }
-        onClose={() => setConfirmAction(null)}
+        onClose={() =>
+          setConfirmAction(null)
+        }
         onConfirm={handleConfirm}
       />
     </>
@@ -351,3 +424,4 @@ const AgentDeliveryOrders = () => {
 };
 
 export default AgentDeliveryOrders;
+

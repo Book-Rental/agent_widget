@@ -13,6 +13,10 @@ type AgentOrdersResponse = {
     limit: number;
     hasMore: boolean;
   };
+   counts: {
+  totalCount: number;
+  [key: string]: number | undefined;
+};
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -107,11 +111,6 @@ export const getAgentOrders = async (
         orderStatus,
 
         assignedDate: shipment.createdAt,
-
-        /* -------------------------------------------------------------- */
-        /* Book                                                            */
-        /* -------------------------------------------------------------- */
-
         items: [
           {
             bookId:
@@ -312,5 +311,6 @@ export const getAgentOrders = async (
   return {
     orders,
     meta: result.data.meta,
+    counts: result.data.counts
   };
 };

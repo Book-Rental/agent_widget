@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Pagination,
@@ -51,19 +52,11 @@ const AgentOrders = () => {
     isUpdatingStatus,
   } = useAgentStatusChange(agentId);
 
-  const [activeTab, setActiveTab] =
-    useState<TabKey>("all");
-
-  const [currentPage, setCurrentPage] =
-    useState(1);
-
-  const [tabCounts, setTabCounts] =
-    useState<Partial<Record<TabKey, number>>>({});
+  const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const currentStatus: OrderStatus | undefined =
-    activeTab === "all"
-      ? undefined
-      : activeTab;
+    activeTab === "all" ? undefined : activeTab;
 
   const {
     data,
@@ -78,16 +71,22 @@ const AgentOrders = () => {
 
   const orders = data?.orders ?? [];
   const meta = data?.meta;
+  const counts = data?.counts;
 
-  if (
-    meta &&
-    tabCounts[activeTab] !== meta.totalRecords
-  ) {
-    setTabCounts((prev) => ({
-      ...prev,
-      [activeTab]: meta.totalRecords,
-    }));
-  }
+  /**
+   * Tab counts come directly from the API response.
+   */
+  const tabCounts: Record<TabKey, number> = {
+    all: counts?.totalCount ?? 0,
+    "Pickup Assigned":
+      counts?.["Pickup Assigned"] ?? 0,
+    "Out For Pickup":
+      counts?.["Out For Pickup"] ?? 0,
+    "Pickup Completed":
+      counts?.["Pickup Completed"] ?? 0,
+    "Arrived At Origin Hub":
+      counts?.["Arrived At Origin Hub"] ?? 0,
+  };
 
   const handleTabChange = (tab: TabKey) => {
     if (tab === activeTab) {
@@ -103,9 +102,10 @@ const AgentOrders = () => {
   }
 
   if (isError) {
-    console.log("error", isError)
+    console.log("error", isError);
+
     return (
-      <div className="flex flex-col items-center justify-center py-20">
+      <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
         <Rb_Text className="text-xl font-semibold text-gray-900">
           Oops! Something went wrong
         </Rb_Text>
@@ -128,9 +128,9 @@ const AgentOrders = () => {
   return (
     <div className="w-full max-w-5xl px-4 py-6">
       <div className="mb-6">
-        <h4 className="text-xl font-semibold text-gray-900">
+        <Rb_Text className="text-2xl font-semibold text-gray-900">
           Pick Up Orders
-        </h4>
+        </Rb_Text>
 
         <p className="mt-1 text-sm text-gray-500">
           Manage and track your assigned pickup orders
@@ -157,7 +157,7 @@ const AgentOrders = () => {
         ) : (
           orders.map((order) => (
             <AgentOrderCard
-              key={order.orderId}
+              key={order.shipmentId}
               order={order}
               statusSlot={
                 <OrderStatusControl
@@ -181,17 +181,16 @@ const AgentOrders = () => {
         )}
       </div>
 
-      {meta &&
-        meta.totalRecords > meta.limit && (
-          <div className="mt-6 flex justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={meta.totalPages}
-              onPageChange={setCurrentPage}
-              disabled={isPending}
-            />
-          </div>
-        )}
+      {meta && meta.totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={meta.totalPages}
+            onPageChange={setCurrentPage}
+            disabled={isPending}
+          />
+        </div>
+      )}
     </div>
   );
 };
