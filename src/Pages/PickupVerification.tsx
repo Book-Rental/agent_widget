@@ -204,59 +204,59 @@ const PickupVerification = () => {
         </div>
       </div>
       <Modal
-  isOpen={showConfirmation}
-  onClose={() => {
-    if (!isUpdatingStatus) {
-      setShowConfirmation(false);
-    }
-  }}
->
-  <div className="w-[480px] max-w-full p-6">
-    <h2 className="text-xl font-semibold text-gray-900">
-      Confirm Pickup
-    </h2>
-
-    <p className="mt-4 text-sm leading-6 text-gray-600">
-      Are you sure you want to mark this shipment as{" "}
-      <span className="font-semibold text-gray-900">
-        Pickup Completed
-      </span>
-      ?
-    </p>
-
-    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3">
-      <p className="text-sm font-medium text-red-600">
-        ⚠️ This action cannot be undone.
-      </p>
-    </div>
-
-    <div className="mt-6 flex justify-end gap-3">
-      <Rb_Button
-        variant="secondary"
-        disabled={isUpdatingStatus}
-        onClick={() => setShowConfirmation(false)}
+        isOpen={showConfirmation}
+        onClose={() => {
+          if (!isUpdatingStatus) {
+            setShowConfirmation(false);
+          }
+        }}
       >
-        Cancel
-      </Rb_Button>
+        <div className="w-[480px] max-w-full p-6">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Confirm Pickup
+          </h2>
 
-      <Rb_Button
-        variant="primary"
-        disabled={isUpdatingStatus}
-        onClick={handleProceed}
-        className="min-w-[160px] !border-red-600 !bg-red-600 !text-white hover:!bg-red-700"
-      >
-        {isUpdatingStatus ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            Updating...
-          </span>
-        ) : (
-          "Confirm Pickup"
-        )}
-      </Rb_Button>
-    </div>
-  </div>
-</Modal>
+          <p className="mt-4 text-sm leading-6 text-gray-600">
+            Are you sure you want to mark this shipment as{" "}
+            <span className="font-semibold text-gray-900">
+              Pickup Completed
+            </span>
+            ?
+          </p>
+
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3">
+            <p className="text-sm font-medium text-red-600">
+              ⚠️ This action cannot be undone.
+            </p>
+          </div>
+
+          <div className="mt-6 flex justify-end gap-3">
+            <Rb_Button
+              variant="secondary"
+              disabled={isUpdatingStatus}
+              onClick={() => setShowConfirmation(false)}
+            >
+              Cancel
+            </Rb_Button>
+
+            <Rb_Button
+              variant="primary"
+              disabled={isUpdatingStatus}
+              onClick={handleProceed}
+              className="min-w-[160px] !border-red-600 !bg-red-600 !text-white hover:!bg-red-700"
+            >
+              {isUpdatingStatus ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Updating...
+                </span>
+              ) : (
+                "Confirm Pickup"
+              )}
+            </Rb_Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

@@ -9,38 +9,33 @@ import {
 
 type Props = {
   isOpen: boolean;
-  action: "accept" | "reject";
-  selectedCount: number;
+  title: string;
+  message: string;
+  confirmLabel: string;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-export function DeliveryConfirmationModal({
+export function ConfirmationModal({
   isOpen,
-  action,
-  selectedCount,
+  title,
+  message,
+  confirmLabel,
   onClose,
   onConfirm,
 }: Props) {
-  const isAccept = action === "accept";
-
+  
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalHeader onClose={onClose}>
         <Rb_Text className="text-lg font-semibold">
-          {isAccept ? "Accept Deliveries" : "Reject Deliveries"}
+           {title}
         </Rb_Text>
       </ModalHeader>
 
       <ModalBody>
         <Rb_Text className="text-sm text-gray-600">
-          {isAccept
-            ? `Are you sure you want to accept ${selectedCount} selected delivery order${
-                selectedCount > 1 ? "s" : ""
-              }?`
-            : `Are you sure you want to reject ${selectedCount} selected delivery order${
-                selectedCount > 1 ? "s" : ""
-              }?`}
+          {message}
         </Rb_Text>
       </ModalBody>
 
@@ -50,7 +45,7 @@ export function DeliveryConfirmationModal({
         </Rb_Button>
 
         <Rb_Button variant="primary" onClick={onConfirm}>
-          {isAccept ? "Accept" : "Reject"}
+          {confirmLabel}
         </Rb_Button>
       </ModalFooter>
     </Modal>
