@@ -107,23 +107,14 @@ export const getAgentOrderDetails = async (
     completedDate:
       shipment.completedAt,
     items: [
-      {
-        bookId:
-          shipment.orderDetails.orderItem.bookId,
-
-        bookName:
-          shipment.orderDetails.orderItem.bookName,
-
-        author:
-          shipment.orderDetails.orderItem.author,
-
-        coverImage:
-          shipment.orderDetails.orderItem.coverImage,
-
-        quantity:
-          shipment.orderDetails.orderItem.quantity,
-      },
-    ],
+  {
+    bookId: shipment.orderDetails?.orderItem?.bookId ?? "",
+    bookName: shipment.orderDetails?.orderItem?.bookName ?? "Item details unavailable",
+    author: shipment.orderDetails?.orderItem?.author ?? "",
+    coverImage: shipment.orderDetails?.orderItem?.coverImage ?? "",
+    quantity: shipment.orderDetails?.orderItem?.quantity ?? 1,
+  },
+],
 
     journeyHistory:
       mapJourneyHistory(
