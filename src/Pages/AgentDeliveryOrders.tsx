@@ -77,8 +77,10 @@ const AgentDeliveryOrders = () => {
     useState(false);
 
   const {
-    onStatusChange,
+    // onStatusChange,
     isUpdatingStatus,
+    onBulkStatusChange,
+    isBulkUpdating,
   } = useAgentStatusChange(agentId);
 
   const currentStatus: OrderStatus | undefined =
@@ -100,7 +102,7 @@ const AgentDeliveryOrders = () => {
   const orders = data?.orders ?? [];
   const meta = data?.meta;
 const counts = data?.counts;
-
+  console.log("orders",data,orders,meta,counts)
   // useEffect(() => {
   //   if (!meta) {
   //     return;
@@ -158,43 +160,65 @@ const tabCounts: Record<TabKey, number> = {
       selectedIds.has(order.shipmentId)
   );
 
-  const hasAssignedSelection =
-    selectedOrders.length > 0 &&
-    selectedOrders.every(
-      (order) =>
-        order.orderStatus ===
-        SELECTABLE_STATUS
-    );
+  // const hasAssignedSelection =
+  //   selectedOrders.length > 0 &&
+  //   selectedOrders.every(
+  //     (order) =>
+  //       order.orderStatus ===
+  //       SELECTABLE_STATUS
+  //   );
+
+  // const handleConfirm = async () => {
+  //   if (!confirmAction) {
+  //     return;
+  //   }
+  //   setIsProcessing(true);
+  //   try {
+  //     const newStatus: OrderStatus =
+  //       confirmAction === "accept"
+  //         ? "Out For Delivery"
+  //         : "Delivery Failed";
+
+  //     await Promise.all(
+  //       selectedOrders
+  //         .filter(
+  //           (
+  //             order
+  //           ): order is typeof order & {
+  //             shipmentId: string;
+  //           } => !!order.shipmentId
+  //         )
+  //         .map((order) =>
+  //           onStatusChange(
+  //             order,
+  //             newStatus
+  //           )
+  //         )
+  //     );
+
+  //     setSelectedIds(new Set());
+  //     setConfirmAction(null);
+  //   } finally {
+  //     setIsProcessing(false);
+  //   }
+  // };
 
   const handleConfirm = async () => {
     if (!confirmAction) {
       return;
     }
-
     setIsProcessing(true);
-
     try {
       const newStatus: OrderStatus =
         confirmAction === "accept"
           ? "Out For Delivery"
           : "Delivery Failed";
 
-      await Promise.all(
-        selectedOrders
-          .filter(
-            (
-              order
-            ): order is typeof order & {
-              shipmentId: string;
-            } => !!order.shipmentId
-          )
-          .map((order) =>
-            onStatusChange(
-              order,
-              newStatus
-            )
-          )
-      );
+      const shipmentIds = selectedOrders
+        .map((order) => order.shipmentId)
+        .filter((id): id is string => !!id);
+
+      await onBulkStatusChange(shipmentIds, newStatus);
 
       setSelectedIds(new Set());
       setConfirmAction(null);
@@ -265,15 +289,17 @@ const tabCounts: Record<TabKey, number> = {
             counts={tabCounts}
             onChange={handleTabChange}
           />
-          {hasAssignedSelection && (
+
             <div className="flex items-stretch gap-2">
               <Rb_Button
                 type="button"
                 variant="outline"
                 size="sm"
                 disabled={
+                  selectedOrders.length === 0 ||
                   isProcessing ||
-                  isUpdatingStatus
+                  isUpdatingStatus ||
+                  isBulkUpdating
                 }
                 onClick={() =>
                   setConfirmAction("reject")
@@ -288,8 +314,10 @@ const tabCounts: Record<TabKey, number> = {
                 variant="primary"
                 size="sm"
                 disabled={
+                  selectedOrders.length === 0 ||
                   isProcessing ||
-                  isUpdatingStatus
+                  isUpdatingStatus ||
+                  isBulkUpdating
                 }
                 onClick={() =>
                   setConfirmAction("accept")
@@ -299,8 +327,6 @@ const tabCounts: Record<TabKey, number> = {
                 Accept ({selectedOrders.length})
               </Rb_Button>
             </div>
-          )}
-
 
         </div>
 

@@ -58,7 +58,7 @@ const ProgressTimeline = ({
                 />
               )}
 
-              <div className="relative z-10 shrink-0">
+              <div className="relative z-0 shrink-0">
                 <div
                   className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
                     isCompleted

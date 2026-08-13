@@ -1,5 +1,13 @@
 import { UpdateShipmentStatusPayload } from "../Types/AgentTypes";
 import type { ShipmentResponse } from "../Types/shipment";
+import type { OrderStatus } from "../Types/AgentTypes";
+
+export type BulkUpdateShipmentPayload = {
+  shipmentIds: string[];
+  updatedBy: string;
+  status: OrderStatus;
+  remarks: string;
+};
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -45,3 +53,25 @@ export const updateShipmentStatus = async (
 
   return response.json();
 }
+
+export const bulkUpdateShipmentStatus = async (
+  payload: BulkUpdateShipmentPayload
+) => {
+  const response = await fetch(
+    `${API_URL}/api/shipment/bulk-update`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to bulk update shipment status");
+  }
+
+  return response.json();
+};
