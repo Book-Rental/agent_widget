@@ -103,10 +103,11 @@ export const getAgentOrders = async (
 
         shipmentType:
           shipment.shipmentType ?? "Forward",
-
-        deliveryType: isDelivery
-          ? "HUB_TO_USER"
-          : "SELLER_TO_HUB",
+journeyType:
+    shipment.journeyType ?? journeyType,
+        // deliveryType: isDelivery
+        //   ? "HUB_TO_USER"
+        //   : "SELLER_TO_HUB",
 
         orderStatus,
 

@@ -35,40 +35,35 @@ export const OrderStatusControl = ({
   onStatusChange,
   disabled = false,
 }: Props) => {
-
   const dropdownConfig = dropdownConfigs.find(
-    (config) =>
-      config.triggerStatus === order.orderStatus
+    (config) => config.triggerStatus === order.orderStatus
   );
-
 
   if (dropdownConfig) {
     return (
       <div
-        className={
+        className={`min-w-[150px] ${
           disabled
-            ? "min-w-[150px] cursor-not-allowed opacity-60"
-            : "min-w-[150px]"
-        }
+            ? "cursor-not-allowed opacity-60"
+            : ""
+        }`}
       >
         <Dropdown
           options={dropdownConfig.options}
           value={order.orderStatus}
           disabled={disabled}
-          onChange={(value) =>
+          onChange={(value) => {
             onStatusChange(
               order,
               value as OrderStatus
-            )
-          }
+            );
+          }}
         />
       </div>
     );
   }
 
-
   const meta = statusMeta[order.orderStatus];
-
 
   if (!meta) {
     return (
@@ -77,7 +72,6 @@ export const OrderStatusControl = ({
       </span>
     );
   }
-
 
   return (
     <span

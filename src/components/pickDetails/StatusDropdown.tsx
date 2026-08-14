@@ -1,18 +1,21 @@
 import { Dropdown } from "@rentbook/rentbook-ui-lib";
-import type { OrderStatus } from "../../Types/AgentTypes";
+import type {
+  JourneyType,
+  OrderStatus,
+} from "../../Types/AgentTypes";
 import { STATUS_META } from "../orderDetails/Agentorderstatusdisplay";
 
 type Props = {
   currentStatus: OrderStatus;
-  deliveryType: string;
+  journeyType: JourneyType;
   onChange: (value: string) => void;
   disabled?: boolean;
 };
 
 const StatusDropdown = ({
   currentStatus,
-  deliveryType,
   onChange,
+  journeyType,
   disabled = false,
 }: Props) => {
   const meta = STATUS_META[currentStatus];
@@ -27,7 +30,7 @@ const StatusDropdown = ({
   };
 
   if (
-    deliveryType === "SELLER_TO_HUB" &&
+    journeyType === "Pickup" &&
     currentStatus === "Pickup Assigned"
   ) {
     return (
@@ -48,7 +51,7 @@ const StatusDropdown = ({
   }
 
   if (
-    deliveryType === "HUB_TO_USER" &&
+    journeyType === "Delivery" &&
     currentStatus === "Delivery Agent Assigned"
   ) {
     return (
@@ -70,10 +73,16 @@ const StatusDropdown = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${meta?.badge}`}
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${
+        meta?.badge ?? ""
+      }`}
     >
-      <span className={`h-2 w-2 rounded-full ${meta?.dot}`} />
-      {meta?.label}
+      <span
+        className={`h-2 w-2 rounded-full ${
+          meta?.dot ?? ""
+        }`}
+      />
+      {meta?.label ?? currentStatus}
     </span>
   );
 };

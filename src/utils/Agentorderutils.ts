@@ -15,3 +15,21 @@ export const formatOrderDate = (date?: string) => {
 
 export const getOrderNumber = (order: AgentOrder) =>
   order.orderNumber?.replace(/^ORD/, "").slice(-6) ?? "";
+
+export const getJourneyLabel = (order: AgentOrder): string => {
+  const { journeyType, shipmentType } = order;
+
+  if (journeyType === "Pickup") {
+    return shipmentType === "Forward"
+      ? "Pickup from Seller"
+      : "Pickup from User";
+  }
+
+  if (journeyType === "Delivery") {
+    return shipmentType === "Forward"
+      ? "Delivery to User"
+      : "Delivery to Seller";
+  }
+
+  return "";
+};

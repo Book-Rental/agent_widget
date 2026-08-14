@@ -18,6 +18,11 @@ export const getAgentOrderDetails = async (
   }
 
   const result = await response.json();
+
+  // API response:
+  // data: {
+  //   shipments: [...]
+  // }
   const shipment = result.data;
 
   const statusMap: Record<string, OrderStatus> = {
@@ -56,8 +61,11 @@ export const getAgentOrderDetails = async (
     Delivered: "Delivered",
 
     "Delivery Failed": "Delivery Failed",
+
     "Return Initiated": "Return Initiated",
+
     Returned: "Returned",
+
     Cancelled: "Cancelled",
   };
 
@@ -70,7 +78,7 @@ export const getAgentOrderDetails = async (
     return history.map((item) => ({
       event: item.event,
       status:
-        statusMap[item.status] ?? item.status,
+        statusMap[item.status] ??  item.status,
       eventAt: item.eventAt,
       remarks: item.remarks,
       hubId: item.hubId,
@@ -80,60 +88,133 @@ export const getAgentOrderDetails = async (
     }));
   };
 
+  // const getDeliveryType = (): DeliveryType => {
+  //   if (
+  //     shipment.journeyType === "Pickup" &&
+  //     shipment.shipmentType === "Forward"
+  //   ) {
+  //     return "SELLER_TO_HUB";
+  //   }
+
+  //   if (
+  //     shipment.journeyType === "Pickup" &&
+  //     shipment.shipmentType === "Return"
+  //   ) {
+  //     return "USER_RETURN_TO_HUB";
+  //   }
+
+  //   if (
+  //     shipment.journeyType === "Delivery" &&
+  //     shipment.shipmentType === "Forward"
+  //   ) {
+  //     return "HUB_TO_USER";
+  //   }
+
+  //   if (
+  //     shipment.journeyType === "Delivery" &&
+  //     shipment.shipmentType === "Return"
+  //   ) {
+  //     return "SELLER_TO_HUB";
+  //   }
+
+  //   return "SELLER_TO_HUB";
+  // };
+
   const originHub =
     shipment.infrastructure?.originHub;
 
   const destinationHub =
     shipment.infrastructure?.destinationHub;
 
+
   const receiver = shipment.receiver;
 
   return {
     shipmentId: shipment.shipmentId,
+
+    journeyType: shipment.journeyType,
+
     awbNumber: shipment.awbNumber,
+
     orderId: shipment.orderId,
+
     orderNumber:
       shipment.awbNumber ?? shipment.orderId,
+
     orderDate: shipment.createdAt,
+
     shipmentType:
       shipment.shipmentType ?? "Forward",
-    deliveryType: "SELLER_TO_HUB",
+
+    // deliveryType: getDeliveryType(),
+
     orderStatus,
+
     assignedDate: shipment.createdAt,
+
     pickupStartedDate:
       shipment.pickupStartedAt,
+
     pickupDate:
       shipment.pickupCompletedAt,
+
     completedDate:
       shipment.completedAt,
-    items: [
-  {
-    bookId: shipment.orderDetails?.orderItem?.bookId ?? "",
-    bookName: shipment.orderDetails?.orderItem?.bookName ?? "Item details unavailable",
-    author: shipment.orderDetails?.orderItem?.author ?? "",
-    coverImage: shipment.orderDetails?.orderItem?.coverImage ?? "",
-    quantity: shipment.orderDetails?.orderItem?.quantity ?? 1,
-  },
-],
 
-    journeyHistory:
-      mapJourneyHistory(
-        shipment.journeyHistory ?? []
-      ),
+    items: [
+      {
+        bookId:
+          shipment.orderDetails?.orderItem?.bookId ?? "",
+
+        bookName:
+          shipment.orderDetails?.orderItem?.bookName ??
+          "Item details unavailable",
+
+        author:
+          shipment.orderDetails?.orderItem?.author ?? "",
+
+        coverImage:
+          shipment.orderDetails?.orderItem?.coverImage ?? "",
+
+        quantity:
+          shipment.orderDetails?.orderItem?.quantity ?? 1,
+      },
+    ],
+
+    journeyHistory: mapJourneyHistory(
+      shipment.journeyHistory ?? []
+    ),
 
     sellerDetails: {
       sellerId: shipment.sellerId,
+
       name: shipment.sender.name,
+
       phoneNumber: shipment.sender.phone,
+
       address: {
         name: shipment.sender.name,
+
         type: "Seller",
-        street: shipment.sender.addressLine1,
-        city: shipment.sender.city,
-        state: shipment.sender.state,
-        zipCode: shipment.sender.pincode,
-        country: shipment.sender.country,
-        phone: shipment.sender.phone,
+
+        street:
+          shipment.sender.addressLine1,
+
+        city:
+          shipment.sender.city,
+
+        state:
+          shipment.sender.state,
+
+        zipCode:
+          shipment.sender.pincode,
+
+        country:
+          shipment.sender.country,
+
+        phone:
+          shipment.sender.phone,
+
         location:
           shipment.sender.location,
       },
@@ -142,21 +223,30 @@ export const getAgentOrderDetails = async (
     hubDetails: originHub
       ? {
           hubId: originHub._id,
+
           name: originHub.hubName,
+
           address:
             originHub.address.street,
+
           city:
             originHub.address.city,
+
           state:
             originHub.address.state,
+
           pincode:
             originHub.address.pincode,
+
           country:
             originHub.address.country,
+
           phoneNumber:
             originHub.phoneNumber,
+
           hubCode:
             originHub.hubCode,
+
           location: undefined,
         }
       : undefined,
@@ -165,40 +255,69 @@ export const getAgentOrderDetails = async (
       destinationHub
         ? {
             hubId: destinationHub._id,
+
             name: destinationHub.hubName,
+
             address:
-             destinationHub.address.street,
+              destinationHub.address.street,
+
             city:
               destinationHub.address.city,
+
             state:
               destinationHub.address.state,
+
             pincode:
               destinationHub.address.pincode,
+
             country:
               destinationHub.address.country,
+
             phoneNumber:
               destinationHub.phoneNumber,
+
             hubCode:
               destinationHub.hubCode,
+
             location: undefined,
           }
         : undefined,
 
     userDetails: receiver
       ? {
-          userId: shipment.buyerId ?? "",
-          name: receiver.name,
-          phoneNumber: receiver.phone,
+          userId:
+            shipment.buyerId ?? "",
+
+          name:
+            receiver.name,
+
+          phoneNumber:
+            receiver.phone,
+
           address: {
-            name: receiver.name,
+            name:
+              receiver.name,
+
             type: "Receiver",
+
             street:
               receiver.addressLine1,
-            city: receiver.city,
-            state: receiver.state,
-            zipCode: receiver.pincode,
-            country: receiver.country,
-            phone: receiver.phone,
+
+            city:
+              receiver.city,
+
+            state:
+              receiver.state,
+
+            zipCode:
+              receiver.pincode,
+
+            country:
+              receiver.country,
+
+            phone:
+              receiver.phone,
+
             location:
               receiver.location,
           },

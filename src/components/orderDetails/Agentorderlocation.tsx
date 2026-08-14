@@ -24,7 +24,7 @@ const LocationBlock = ({
 
 export const AgentOrderLocation = ({ order }: { order: AgentOrder }) => {
   if (
-    order.deliveryType === "SELLER_TO_HUB" &&
+    order.journeyType === "Pickup" &&
     order.sellerDetails &&
     (order.orderStatus === "Pickup Assigned" ||
       order.orderStatus === "Out For Pickup")
@@ -41,7 +41,7 @@ export const AgentOrderLocation = ({ order }: { order: AgentOrder }) => {
   }
 
   if (
-    order.deliveryType === "SELLER_TO_HUB" &&
+    order.journeyType === "Pickup" &&
     order.hubDetails &&
     (order.orderStatus === "Pickup Completed" ||
       order.orderStatus === "Arrived At Origin Hub")
@@ -59,7 +59,7 @@ export const AgentOrderLocation = ({ order }: { order: AgentOrder }) => {
   }
 
   if (
-    order.deliveryType === "HUB_TO_USER" &&
+    order.journeyType === "Delivery" &&
     order.userDetails &&
     (order.orderStatus === "Delivery Agent Assigned" ||
       order.orderStatus === "Out For Delivery" ||

@@ -1,3 +1,5 @@
+import { JourneyType } from "./AgentTypes";
+
 export interface ShipmentResponse {
   status: string;
   message: string;
@@ -14,6 +16,7 @@ export interface Shipment {
   sender: ShipmentPerson;
   receiver: ShipmentPerson;
   shipmentType: "Forward" | "Return";
+  journeyType: JourneyType;
   paymentMode: "Prepaid" | "COD";
   codAmount: number;
   currentStatus: ShipmentStatus;
