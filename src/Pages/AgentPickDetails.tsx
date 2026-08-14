@@ -20,6 +20,7 @@ import {
 } from "@rentbook/rentbook-ui-lib";
 
 import { FiRefreshCw } from "react-icons/fi";
+import { getJourneyLabel } from "../utils/Agentorderutils";
 
 const PICKUP_STATUSES: OrderStatus[] = [
   "Pickup Assigned",
@@ -236,14 +237,14 @@ const AgentPickDetails = () => {
       </div>
     );
   }
-
+const labelMessage = getJourneyLabel(order);
   return (
     <div className="w-full mt-7">
       <PageHeader
         title={pageTitle}
         orderNumber={order.orderNumber}
         currentStatus={currentStatus}
-        deliveryType={order.deliveryType}
+        journeyType={order.journeyType}
         onStatusChange={handleStatusChange}
         disabled={isUpdatingStatus}
       />
@@ -251,7 +252,7 @@ const AgentPickDetails = () => {
       <div className="mt-6 grid w-full min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         {/* LEFT */}
         <div className="min-w-0 space-y-6">
-          <BookDetails item={order.items[0]} />
+          <BookDetails item={order.items[0]} labelMessage={labelMessage}/>
 
           {showSellerDetails && seller && (
             <DetailsBlock

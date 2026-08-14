@@ -12,15 +12,28 @@ import { STATUS_CONFIG } from "../constants/shipmentStatus";
 
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
-import { FiAlertCircle } from "react-icons/fi";
+import { FiAlertCircle, FiMapPin } from "react-icons/fi";
+import ReferencePhotosSection from "../components/sellerPickup/ReferencePhotosSection";
+import { getJourneyLabel } from "../utils/Agentorderutils";
+import { AgentOrder } from "../Types/AgentTypes";
+// import { getJourneyLabel } from "../utils/Agentorderutils";
 
+const staticReferencePhotos = {
+  front: "https://placehold.co/600x800?text=Front+Cover",
+  back: "https://placehold.co/600x800?text=Back+Cover",
+  spine: "https://placehold.co/600x800?text=Spine",
+  damagePhotos: [
+    "https://placehold.co/600x800?text=Damage+Photo+1",
+    "https://placehold.co/600x800?text=Damage+Photo+2",
+  ],
+};
 
 const PickupVerification = () => {
-    const pathname = window.location.pathname;
+  const pathname = window.location.pathname;
 
- const pathParts = pathname.split("/").filter(Boolean); // /agent/pickup-orders/:shipmentId/pickup-verification 
-   const shipmentId = pathParts[2] ?? ""; 
-    const [photosComplete, setPhotosComplete] = useState(false);
+  const pathParts = pathname.split("/").filter(Boolean); // /agent/pickup-orders/:shipmentId/pickup-verification 
+  const shipmentId = pathParts[2] ?? "";
+  const [photosComplete, setPhotosComplete] = useState(false);
   const [conditionSelected, setConditionSelected] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -36,7 +49,7 @@ const PickupVerification = () => {
   } = useShipment(shipmentId);
 
   const shipment = data?.data;
-
+  console.log("shipment", data)
   if (isLoading) {
     return <Rb_LoadingSpinner />;
   }
@@ -77,35 +90,41 @@ const PickupVerification = () => {
   }
 
   const isReturnPickup = shipment.shipmentType === "Return";
+  const order = {
+    shipmentType: shipment.shipmentType,
+    journeyType: shipment.journeyType,
+  } as AgentOrder;
+
+  const labelMessage = getJourneyLabel(order);
 
   const handleProceed = () => {
     if (isUpdatingStatus) return;
 
-   updateStatus(
-  {
-    shipmentId: shipment.shipmentId,
-    payload: {
-      status: "Pickup Completed",
-      event: STATUS_CONFIG["Pickup Completed"]!.event,
-      remarks: STATUS_CONFIG["Pickup Completed"]!.remarks,
-      agentId,
-      updatedBy: agentId,
-    },
-  },
-  {
-    onSuccess: () => {
-      setShowConfirmation(false);
+    updateStatus(
+      {
+        shipmentId: shipment.shipmentId,
+        payload: {
+          status: "Pickup Completed",
+          event: STATUS_CONFIG["Pickup Completed"]!.event,
+          remarks: STATUS_CONFIG["Pickup Completed"]!.remarks,
+          agentId,
+          updatedBy: agentId,
+        },
+      },
+      {
+        onSuccess: () => {
+          setShowConfirmation(false);
 
-      window.history.pushState(
-        {},
-        "",
-        `/agent/pickup-orders/${shipmentId}/confirmation`
-      );
+          window.history.pushState(
+            {},
+            "",
+            `/agent/pickup-orders/${shipmentId}/confirmation`
+          );
 
-      window.dispatchEvent(new PopStateEvent("popstate"));
-    },
-  }
-);
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        },
+      }
+    );
   };
 
   return (
@@ -124,9 +143,18 @@ const PickupVerification = () => {
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <Rb_Text className="text-lg font-semibold">
-            Shipment Details
-          </Rb_Text>
+          <div className="flex items-center justify-between gap-4">
+  <Rb_Text className="text-lg font-semibold">
+    Shipment Details
+  </Rb_Text>
+
+  {labelMessage && (
+    <div className="inline-flex items-center gap-1.5 rounded-md bg-slate-50 px-2.5 py-1 text-sm font-medium text-slate-600 ring-1 ring-slate-100">
+      <FiMapPin className="h-4 w-4 text-slate-500" />
+      <span>{labelMessage}</span>
+    </div>
+  )}
+</div>
 
           <div className="mt-4 space-y-3">
             <div>
@@ -177,9 +205,15 @@ const PickupVerification = () => {
               </Rb_Text>
               <Rb_Text>{shipment.receiver.name}</Rb_Text>
             </div>
+
           </div>
         </div>
 
+        {shipment.shipmentType === "Return" && (
+          <ReferencePhotosSection
+            referencePhotos={staticReferencePhotos}
+          />
+        )}
         <BookPhotoUpload
           onChange={(data) =>
             setPhotosComplete(data.isComplete)

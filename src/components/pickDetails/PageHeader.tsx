@@ -2,15 +2,16 @@ import { Rb_Text } from "@rentbook/rentbook-ui-lib";
 import StatusDropdown from "./StatusDropdown";
 
 import type {
+  JourneyType,
   OrderStatus,
-  DeliveryType,
+  // DeliveryType,
 } from "../../Types/AgentTypes";
 
 type Props = {
   title: string;
   orderNumber: string;
   currentStatus: OrderStatus;
-  deliveryType: DeliveryType;
+  journeyType: JourneyType;
   onStatusChange: (value: string) => void;
   disabled?: boolean;
 };
@@ -19,9 +20,8 @@ const PageHeader = ({
   title,
   orderNumber,
   currentStatus,
-  deliveryType,
+  journeyType,
   onStatusChange,
-  disabled = false,
 }: Props) => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:flex-row md:items-center">
@@ -40,11 +40,10 @@ const PageHeader = ({
 
       <div className="w-full md:w-auto">
         <StatusDropdown
-          currentStatus={currentStatus}
-          deliveryType={deliveryType}
-          onChange={onStatusChange}
-          disabled={disabled}
-        />
+  currentStatus={currentStatus}
+  journeyType={journeyType}
+  onChange={onStatusChange}
+/>
       </div>
     </div>
   );

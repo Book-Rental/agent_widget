@@ -38,10 +38,10 @@ export type ShipmentType =
   | "Return"
   | "Exchange";
 
-export type DeliveryType =
-  | "SELLER_TO_HUB"
-  | "USER_RETURN_TO_HUB"
-  | "HUB_TO_USER";
+// export type DeliveryType =
+//   | "SELLER_TO_HUB"
+//   | "USER_RETURN_TO_HUB"
+//   | "HUB_TO_USER";
 
 export type SellerDetails = {
   name: string;
@@ -124,7 +124,6 @@ export type AgentOrder = {
   orderDate: string;
 
   shipmentType: ShipmentType;
-  deliveryType: DeliveryType;
 
   orderStatus: OrderStatus;
 
@@ -152,6 +151,7 @@ export type AgentOrder = {
   deliveryVerification?: DeliveryVerification;
 
   journeyHistory: JourneyHistory[];
+  journeyType: JourneyType
 };
 
 export type ShipmentApi = {
@@ -289,3 +289,7 @@ export type UpdateShipmentStatusPayload = {
   remarks: string;
   updatedBy: string;
 };
+
+export type JourneyType =
+"Pickup"|
+"Delivery"

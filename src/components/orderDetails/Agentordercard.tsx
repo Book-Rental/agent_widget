@@ -3,8 +3,10 @@ import { Rb_Button, Rb_Image, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { AgentOrder } from "../../Types/AgentTypes";
 import {
   formatOrderDate,
+  getJourneyLabel,
   getOrderNumber,
 } from "../../utils/Agentorderutils";
+import { FiMapPin } from "react-icons/fi";
 
 type AgentOrderCardProps = {
   order: AgentOrder;
@@ -22,6 +24,7 @@ export const AgentOrderCard = ({
   selectionSlot,
 }: AgentOrderCardProps) => {
   const item = order.items?.[0] ?? null;
+  const labelMessage = getJourneyLabel(order);
 
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
@@ -29,6 +32,7 @@ export const AgentOrderCard = ({
         {selectionSlot && (
           <div className="flex items-center">{selectionSlot}</div>
         )}
+
         <Rb_Image
           src={item?.coverImage || "/images/book-placeholder.png"}
           alt={item?.bookName || "Book cover"}
@@ -52,6 +56,13 @@ export const AgentOrderCard = ({
                 <Rb_Text className="mt-1 text-xs text-gray-500 break-words">
                   by {item.author}
                 </Rb_Text>
+              )}
+
+              {labelMessage && (
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-slate-50 px-2.5 py-1 text-sm font-medium text-slate-600 ring-1 ring-slate-100">
+                  <FiMapPin className="h-4 w-4 text-slate-500" />
+                  <span>{labelMessage}</span>
+                </div>
               )}
 
               {order.items && order.items.length > 1 && (
