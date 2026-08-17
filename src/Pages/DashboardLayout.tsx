@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FiMenu } from "react-icons/fi";
+import { useEffect, useState } from "react";
+// import { FiMenu } from "react-icons/fi";
 import Sidebar from "../components/Sidebar";
 
 type Props = {
@@ -13,6 +13,12 @@ const DashboardLayout = ({
 }: Props) => {
 
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setMobileOpen((prev) => !prev);
+    window.addEventListener("toggle-mobile-sidebar", handleToggle);
+    return () => window.removeEventListener("toggle-mobile-sidebar", handleToggle);
+  }, []);
 
   return (
     <div className="flex min-h-screen">
@@ -34,12 +40,12 @@ const DashboardLayout = ({
       >
 
         {/* Mobile Menu Button */}
-        <button
+        {/* <button
           onClick={() => setMobileOpen(true)}
           className="p-4 md:hidden"
         >
           <FiMenu size={24} />
-        </button>
+        </button> */}
 
 
         <div
