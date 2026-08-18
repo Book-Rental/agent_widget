@@ -54,6 +54,7 @@ const AgentOrders = () => {
 
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   const currentStatus: OrderStatus | undefined =
     activeTab === "all" ? undefined : activeTab;
@@ -164,8 +165,14 @@ const AgentOrders = () => {
                   order={order}
                   statusMeta={STATUS_META}
                   dropdownConfigs={DROPDOWN_CONFIGS}
-                  onStatusChange={onStatusChange}
-                  disabled={isUpdatingStatus}
+                  onStatusChange={(order, status) => {
+                    setUpdatingOrderId(order.shipmentId);
+                    onStatusChange(order, status);
+                  }}
+                  disabled={
+                    isUpdatingStatus &&
+                    updatingOrderId === order.shipmentId
+                  }
                 />
               }
               locationSlot={
