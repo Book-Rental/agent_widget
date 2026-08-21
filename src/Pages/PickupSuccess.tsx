@@ -45,7 +45,7 @@ const PickupSuccess = ({
 
   if (isError || !shipment) {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-6">
+    <div className="mt-8 flex min-h-[60vh] items-center justify-center px-6">
       <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
           <FiAlertCircle className="text-3xl text-red-500" />
@@ -64,7 +64,7 @@ const PickupSuccess = ({
   );
 }
   return (
-    <div className="mx-auto max-w-lg rounded-xl bg-white p-6 shadow-md">
+    <div className="mx-auto mt-8 max-w-lg rounded-xl bg-white p-6 shadow-md">
       {/* Scoped keyframes for effects that plain Tailwind utilities can't express */}
       <style>{`
         @keyframes popIn {
@@ -183,7 +183,7 @@ const PickupSuccess = ({
 
         <div className="grid grid-cols-2 border-b border-gray-200 px-4 py-3">
           <Rb_Text className="text-gray-500">
-            Seller
+            Picked up from 
           </Rb_Text>
 
           <Rb_Text className="text-right font-medium text-gray-900">
@@ -193,7 +193,7 @@ const PickupSuccess = ({
 
         <div className="grid grid-cols-2 border-b border-gray-200 px-4 py-3">
           <Rb_Text className="text-gray-500">
-            Picked Up From
+            Address
           </Rb_Text>
           <Rb_Text className="text-right text-gray-900">
             {`${shipment.sender.addressLine1}, ${shipment.sender.city}`}

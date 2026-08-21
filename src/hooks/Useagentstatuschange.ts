@@ -3,13 +3,13 @@ import { useUpdateShipmentStatus } from "./useUpdateShipmentStatus";
 import { useBulkUpdateShipmentStatus } from "./useBulkUpdateShipmentStatus";
 import { STATUS_CONFIG } from "../constants/shipmentStatus";
 import type { AgentOrder, OrderStatus } from "../Types/AgentTypes";
+import { useState } from "react";
 
 export const useAgentStatusChange = (agentId: string) => {
   const queryClient = useQueryClient();
-
+  const [isSyncingStatus, setIsSyncingStatus] = useState(false);
   const {
     mutate: updateStatus,
-    isPending: isUpdatingStatus,
   } = useUpdateShipmentStatus();
 
   const {
@@ -17,15 +17,12 @@ export const useAgentStatusChange = (agentId: string) => {
     isPending: isBulkUpdating,
   } = useBulkUpdateShipmentStatus();
 
-  const onStatusChange = (
-    order: AgentOrder,
-    status: OrderStatus
-  ) => {
+  const onStatusChange = ( order: AgentOrder, status: OrderStatus ) => {
     if (!order.shipmentId) return;
-
     const config = STATUS_CONFIG[status];
-
     if (!config) return;
+
+    setIsSyncingStatus(true);
 
     updateStatus(
       {
@@ -43,6 +40,10 @@ export const useAgentStatusChange = (agentId: string) => {
           await queryClient.invalidateQueries({
             queryKey: ["agent-orders", agentId],
           });
+          setIsSyncingStatus(false);
+        },
+         onError: () => {
+          setIsSyncingStatus(false);
         },
       }
     );
@@ -75,7 +76,7 @@ export const useAgentStatusChange = (agentId: string) => {
 
   return {
     onStatusChange,
-    isUpdatingStatus,
+    isUpdatingStatus: isSyncingStatus,
     onBulkStatusChange,
     isBulkUpdating,
   };
