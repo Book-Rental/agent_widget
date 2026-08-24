@@ -127,11 +127,11 @@ const AgentOrders = () => {
   }
 
   return (
-    <div className="w-full max-w-5xl px-4 py-6">
+    <div className="w-full max-w-5xl px-2 pt-1 pb-6 sm:px-4 sm:pt-4 lg:px-6 lg:pt-0">
       <div className="mb-6">
-        <Rb_Text className="text-2xl font-semibold text-gray-900">
+        <h4 className="text-xl font-semibold text-gray-900">
           Pick Up Orders
-        </Rb_Text>
+        </h4>
 
         <p className="mt-1 text-sm text-gray-500">
           Manage and track your assigned pickup orders

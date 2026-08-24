@@ -129,9 +129,9 @@ const PickupVerification = () => {
 
   return (
     <>
-      <div className="max-w-4xl space-y-6 p-6">
+      <div className="w-full space-y-4 px-2 pt-0 pb-6 sm:space-y-6 sm:px-0 sm:pt-0 sm:pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
             {isReturnPickup
               ? "Return Pickup Verification"
               : "Seller Pickup Verification"}
@@ -142,70 +142,83 @@ const PickupVerification = () => {
           </p>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-  <Rb_Text className="text-lg font-semibold">
-    Shipment Details
-  </Rb_Text>
+        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <Rb_Text className="text-lg font-semibold">
+              Shipment Details
+            </Rb_Text>
 
-  {labelMessage && (
-    <div className="inline-flex items-center gap-1.5 rounded-md bg-slate-50 px-2.5 py-1 text-sm font-medium text-slate-600 ring-1 ring-slate-100">
-      <FiMapPin className="h-4 w-4 text-slate-500" />
-      <span>{labelMessage}</span>
-    </div>
-  )}
-</div>
+            {labelMessage && (
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-slate-50 px-2.5 py-1 text-sm font-medium text-slate-600 ring-1 ring-slate-100">
+                <FiMapPin className="h-4 w-4 shrink-0 text-slate-500" />
+                <span>{labelMessage}</span>
+              </div>
+            )}
+          </div>
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 Shipment ID
               </Rb_Text>
-              <Rb_Text>{shipment.shipmentId}</Rb_Text>
+              <Rb_Text className="mt-1 break-all text-sm font-medium text-gray-800">
+                {shipment.shipmentId}
+              </Rb_Text>
             </div>
 
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 Order ID
               </Rb_Text>
-              <Rb_Text>{shipment.orderId}</Rb_Text>
+              <Rb_Text className="mt-1 break-all text-sm font-medium text-gray-800">
+                {shipment.orderId}
+              </Rb_Text>
             </div>
 
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 AWB Number
               </Rb_Text>
-              <Rb_Text>{shipment.awbNumber}</Rb_Text>
+              <Rb_Text className="mt-1 text-sm font-medium text-gray-800">
+                {shipment.awbNumber}
+              </Rb_Text>
             </div>
 
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 Current Status
               </Rb_Text>
-              <Rb_Text>{shipment.currentStatus}</Rb_Text>
+              <Rb_Text className="mt-1 text-sm font-medium text-gray-800">
+                {shipment.currentStatus}
+              </Rb_Text>
             </div>
 
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 Assigned Agent
               </Rb_Text>
-              <Rb_Text>{shipment.assignedAgent.fullName}</Rb_Text>
+              <Rb_Text className="mt-1 text-sm font-medium text-gray-800">
+                {shipment.assignedAgent?.fullName ?? "-"}
+              </Rb_Text>
             </div>
 
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 Sender
               </Rb_Text>
-              <Rb_Text>{shipment.sender.name}</Rb_Text>
+              <Rb_Text className="mt-1 text-sm font-medium text-gray-800">
+                {shipment.sender?.name ?? "-"}
+              </Rb_Text>
             </div>
 
             <div>
-              <Rb_Text className="text-xs text-gray-500">
+              <Rb_Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
                 Receiver
               </Rb_Text>
-              <Rb_Text>{shipment.receiver.name}</Rb_Text>
+              <Rb_Text className="mt-1 text-sm font-medium text-gray-800">
+                {shipment.receiver?.name ?? "-"}
+              </Rb_Text>
             </div>
-
           </div>
         </div>
 
