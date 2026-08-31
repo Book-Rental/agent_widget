@@ -4,9 +4,13 @@ import { type RequiredPhotoType, type RequiredPhotos } from "../../Types/pickup"
 import RequiredPhotosSection from "./RequiredPhotosSection";
 import DamagePhotoSection from "./DamagePhotoSection";
 
-
 interface BookPhotoUploadProps {
-  onChange?: (data: { requiredPhotos: RequiredPhotos; damagePhotos: File[]; isComplete: boolean }) => void;
+  onChange?: (data: {
+    requiredPhotos: RequiredPhotos;
+    damagePhotos: File[];
+    files: File[];
+    isComplete: boolean;
+  }) => void;
 }
 
 const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
@@ -20,9 +24,28 @@ const BookPhotoUpload = ({ onChange }: BookPhotoUploadProps) => {
   const [damagePhotos, setDamagePhotos] = useState<File[]>([]);
   const allRequiredUploaded = requiredPhotos.front !== null && requiredPhotos.back !== null && requiredPhotos.spine !== null;
 
-  const emitChange = (next: RequiredPhotos, damage: File[]) => {
-    const isComplete = next.front !== null && next.back !== null && next.spine !== null;
-    onChange?.({ requiredPhotos: next, damagePhotos: damage, isComplete });
+  const emitChange = (
+    next: RequiredPhotos,
+    damage: File[]
+  ) => {
+    const isComplete =
+      next.front !== null &&
+      next.back !== null &&
+      next.spine !== null;
+
+    const files = [
+      next.front,
+      next.back,
+      next.spine,
+      ...damage,
+    ].filter((file): file is File => file !== null);
+
+    onChange?.({
+      requiredPhotos: next,
+      damagePhotos: damage,
+      files,
+      isComplete,
+    });
   };
 
 

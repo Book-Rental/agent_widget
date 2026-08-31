@@ -75,3 +75,27 @@ export const bulkUpdateShipmentStatus = async (
 
   return response.json();
 };
+
+export const createBookInspection = async (
+  shipmentId: string,
+  formData: FormData
+) => {
+  const response = await fetch(
+    `${API_URL}/api/book-inspection/${shipmentId}`,
+    {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Failed to complete book inspection"
+    );
+  }
+
+  return data;
+};

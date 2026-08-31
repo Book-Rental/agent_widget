@@ -4,12 +4,13 @@ import { Rb_Radio, Rb_Text } from "@rentbook/rentbook-ui-lib";
 type BookConditionType =
   | "GOOD"
   | "MINOR_DAMAGE"
-  | "MODERATE_DAMAGE"
-  | "SEVERE_DAMAGE";
+  | "MAJOR_DAMAGE"
+  | "LOST";
 
 interface BookConditionProps {
   onConditionChange: (
-    condition: BookConditionType | null
+    condition: BookConditionType | null,
+    remarks: string
   ) => void;
 }
 
@@ -23,18 +24,20 @@ const conditions = [
     value: "MINOR_DAMAGE",
   },
   {
-    label: "Moderate Damage",
-    value: "MODERATE_DAMAGE",
+    label: "Major Damage",
+    value: "MAJOR_DAMAGE",
   },
   {
-    label: "Severe Damage",
-    value: "SEVERE_DAMAGE",
+    label: "Lost",
+    value: "LOST",
   },
 ] as const;
 
 const MAX_REMARK_LENGTH = 500;
 
-const BookCondition = ({ onConditionChange }: BookConditionProps) => {
+const BookCondition = ({
+  onConditionChange,
+}: BookConditionProps) => {
   const [selectedCondition, setSelectedCondition] =
     useState<BookConditionType | null>(null);
 
@@ -51,7 +54,6 @@ const BookCondition = ({ onConditionChange }: BookConditionProps) => {
       </Rb_Text>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Left Section */}
         <div>
           <Rb_Text className="mb-3 font-medium">
             Condition
@@ -66,10 +68,12 @@ const BookCondition = ({ onConditionChange }: BookConditionProps) => {
                 <Rb_Radio
                   name="bookCondition"
                   value={condition.value}
-                  checked={selectedCondition === condition.value}
+                  checked={
+                    selectedCondition === condition.value
+                  }
                   onChange={() => {
                     setSelectedCondition(condition.value);
-                    onConditionChange(condition.value);
+                    onConditionChange(condition.value, remarks);
                   }}
                   label={condition.label}
                 />
@@ -78,7 +82,6 @@ const BookCondition = ({ onConditionChange }: BookConditionProps) => {
           </div>
         </div>
 
-        {/* Right Section */}
         <div className="flex flex-col">
           <Rb_Text className="font-medium">
             Remarks
@@ -89,7 +92,11 @@ const BookCondition = ({ onConditionChange }: BookConditionProps) => {
 
           <textarea
             value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setRemarks(value);
+              onConditionChange(selectedCondition, value);
+            }}
             maxLength={MAX_REMARK_LENGTH}
             rows={9}
             placeholder="Add any observations about the book..."
