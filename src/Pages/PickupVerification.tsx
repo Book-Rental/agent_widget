@@ -7,15 +7,13 @@ import {
 } from "@rentbook/rentbook-ui-lib";
 
 import { useShipment } from "../hooks/useShipment";
-import { useUpdateShipmentStatus } from "../hooks/useUpdateShipmentStatus";
-import { STATUS_CONFIG } from "../constants/shipmentStatus";
-
 import BookCondition from "../components/sellerPickup/BookCondition";
 import BookPhotoUpload from "../components/sellerPickup/BookPhotoUpload";
 import { FiAlertCircle, FiMapPin } from "react-icons/fi";
 import ReferencePhotosSection from "../components/sellerPickup/ReferencePhotosSection";
 import { getJourneyLabel } from "../utils/Agentorderutils";
 import { AgentOrder } from "../Types/AgentTypes";
+import { useBookInspection } from "../hooks/useBookInspection";
 // import { getJourneyLabel } from "../utils/Agentorderutils";
 
 const staticReferencePhotos = {
@@ -34,13 +32,17 @@ const PickupVerification = () => {
   const pathParts = pathname.split("/").filter(Boolean); // /agent/pickup-orders/:shipmentId/pickup-verification 
   const shipmentId = pathParts[2] ?? "";
   const [photosComplete, setPhotosComplete] = useState(false);
-  const [conditionSelected, setConditionSelected] = useState(false);
+  const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
+  const [inspectionPhotos, setInspectionPhotos] = useState<File[]>([]);
+  const [inspectionRemarks, setInspectionRemarks] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // const agentId = "6a6b29dbf447531ecb351110";
   const agentId = window.HOST_USER_INFO?.referenceId ?? "";
-  const { mutate: updateStatus, isPending: isUpdatingStatus, } = useUpdateShipmentStatus();
-
+  const {
+    mutate: createInspection,
+    isPending: isInspecting,
+  } = useBookInspection();
   const {
     data,
     isLoading,
@@ -98,18 +100,28 @@ const PickupVerification = () => {
   const labelMessage = getJourneyLabel(order);
 
   const handleProceed = () => {
-    if (isUpdatingStatus) return;
+    if (
+      !selectedCondition ||
+      isInspecting ||
+      !shipment
+    ) {
+      return;
+    }
 
-    updateStatus(
+    const formData = new FormData();
+
+    formData.append("inspectedBy", agentId);
+    formData.append("condition", selectedCondition);
+    formData.append("notes", inspectionRemarks);
+
+    inspectionPhotos.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    createInspection(
       {
         shipmentId: shipment.shipmentId,
-        payload: {
-          status: "Pickup Completed",
-          event: STATUS_CONFIG["Pickup Completed"]!.event,
-          remarks: STATUS_CONFIG["Pickup Completed"]!.remarks,
-          agentId,
-          updatedBy: agentId,
-        },
+        formData,
       },
       {
         onSuccess: () => {
@@ -121,7 +133,9 @@ const PickupVerification = () => {
             `/agent/pickup-orders/${shipmentId}/confirmation`
           );
 
-          window.dispatchEvent(new PopStateEvent("popstate"));
+          window.dispatchEvent(
+            new PopStateEvent("popstate")
+          );
         },
       }
     );
@@ -228,22 +242,24 @@ const PickupVerification = () => {
           />
         )}
         <BookPhotoUpload
-          onChange={(data) =>
-            setPhotosComplete(data.isComplete)
-          }
+          onChange={(data) => {
+            setPhotosComplete(data.isComplete);
+            setInspectionPhotos(data.files);
+          }}
         />
 
         <BookCondition
-          onConditionChange={(condition) =>
-            setConditionSelected(condition !== null)
-          }
+          onConditionChange={(condition, remarks) => {
+            setSelectedCondition(condition);
+            setInspectionRemarks(remarks);
+          }}
         />
 
         <div className="flex justify-end pt-2">
           <Rb_Button
             variant="primary"
             onClick={() => setShowConfirmation(true)}
-            disabled={!photosComplete || !conditionSelected}
+            disabled={!photosComplete || !selectedCondition}
             className="min-w-[200px]"
           >
             Proceed with Pickup
@@ -253,7 +269,7 @@ const PickupVerification = () => {
       <Modal
         isOpen={showConfirmation}
         onClose={() => {
-          if (!isUpdatingStatus) {
+          if (!isInspecting) {
             setShowConfirmation(false);
           }
         }}
@@ -280,7 +296,7 @@ const PickupVerification = () => {
           <div className="mt-6 flex justify-end gap-3">
             <Rb_Button
               variant="secondary"
-              disabled={isUpdatingStatus}
+              disabled={isInspecting}
               onClick={() => setShowConfirmation(false)}
             >
               Cancel
@@ -288,14 +304,14 @@ const PickupVerification = () => {
 
             <Rb_Button
               variant="primary"
-              disabled={isUpdatingStatus}
+              disabled={isInspecting}
               onClick={handleProceed}
               className="min-w-[160px] !border-red-600 !bg-red-600 !text-white hover:!bg-red-700"
             >
-              {isUpdatingStatus ? (
+              {isInspecting ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Updating...
+                  Inspecting...
                 </span>
               ) : (
                 "Confirm Pickup"
