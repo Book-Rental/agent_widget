@@ -143,7 +143,7 @@ const PickupVerification = () => {
 
   return (
     <>
-      <div className="w-full space-y-4 px-2 pt-0 pb-6 sm:space-y-6 sm:px-0 sm:pt-0 sm:pb-6">
+      <div className="mt-7 w-full space-y-4 px-2 pb-6 sm:space-y-6 sm:px-0 sm:pb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
             {isReturnPickup
